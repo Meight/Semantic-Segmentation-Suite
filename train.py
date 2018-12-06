@@ -50,7 +50,7 @@ args = parser.parse_args()
 
 def data_augmentation(input_image, output_image):
     # Data augmentation
-    input_image, output_image = utils.random_crop(input_image, output_image, args.crop_height, args.crop_width)
+    input_image, output_image = utils.resize_to_size(input_image, output_image, args.input_size)
 
     if args.h_flip and random.randint(0,1):
         input_image = cv2.flip(input_image, 1)
