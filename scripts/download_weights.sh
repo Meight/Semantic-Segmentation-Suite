@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
 #SBATCH --job-name=download-weights
-#SBATCH --output=/projets/thesepizenberg/deep-learning/logs/download.out
-#SBATCH --error=/projets/thesepizenberg/deep-learning/logs/download.out
+#SBATCH --output=/projets/thesepizenberg/deep-learning/logs/download-%j.out
+#SBATCH --error=/projets/thesepizenberg/deep-learning/logs/download-%j.out
 
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=3
