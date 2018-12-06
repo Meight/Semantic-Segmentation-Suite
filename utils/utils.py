@@ -187,7 +187,7 @@ def resize_to_size(image, label, desired_size):
     label = cv2.copyMakeBorder(label, top, bottom, left, right, cv2.BORDER_CONSTANT,
                                value=color)
 
-    return random_crop(image, label, desired_size, desired_size)
+    return image, label
 
 # Randomly crop the image to a specific size. For data augmentation
 def random_crop(image, label, crop_height, crop_width):
