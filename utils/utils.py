@@ -191,7 +191,7 @@ def resize_to_size(image, label, desired_size):
 # Randomly crop the image to a specific size. For data augmentation
 def random_crop(image, label, crop_height, crop_width):
     if (image.shape[0] != label.shape[0]) or (image.shape[1] != label.shape[1]):
-        raise Exception('Image and label must have the same dimensions!')
+        raise Exception('Image and label must have the same dimensions! {} vs {}'.format(image.shape, label.shape))
 
     if (crop_width <= image.shape[1]) and (crop_height <= image.shape[0]):
         x = random.randint(0, image.shape[1]-crop_width)
