@@ -52,7 +52,7 @@ srun keras-py3-tf /users/thesepizenberg/mlebouch/venv/bin/python "$TRAIN_SCRIPT_
                 --num_epochs=200 \
                 --checkpoint_step=2 \
                 --validation_step=1 \
-                --dataset=voc_ha \
+                --dataset=voc-ha \
                 --crop_height=384 \
                 --crop_width=384 \
                 --model=FC-DenseNet56 \
