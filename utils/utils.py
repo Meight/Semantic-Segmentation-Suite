@@ -175,6 +175,7 @@ def resize_to_size(image, label, desired_size):
 
     # new_size should be in (width, height) format
     image = cv2.resize(image, (new_size[1], new_size[0]))
+    label = cv2.resize(label, (new_size[1], new_size[0]))
 
     delta_w = desired_size - new_size[1]
     delta_h = desired_size - new_size[0]
