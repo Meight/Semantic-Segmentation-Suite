@@ -55,7 +55,7 @@ srun keras-py3-tf /users/thesepizenberg/mlebouch/venv/bin/python "$TRAIN_SCRIPT_
                 --dataset=voc-ha \
                 --crop_height=384 \
                 --crop_width=384 \
-                --input_size=500 \
+                --input_size=512 \
                 --model=FC-DenseNet56 \
                 --frontend=ResNet101
 wait
