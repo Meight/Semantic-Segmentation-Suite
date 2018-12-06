@@ -82,7 +82,7 @@ def get_labels_from_annotation_batch(annotation_batch_tensor, class_labels):
 
 
 def get_valid_entries_indices_from_annotation_batch(annotation_batch_tensor):
-    mask_out_class_label = 255
+    mask_out_class_label = 255.0
 
     valid_labels_mask = tf.not_equal(annotation_batch_tensor,
                                      mask_out_class_label)

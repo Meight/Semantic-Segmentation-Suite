@@ -237,10 +237,15 @@ def compute_class_accuracies(pred, label, num_classes):
     return accuracies
 
 
-def compute_mean_iou(pred, label):
+def filter_valid_entries(prediction, label):
+    valid_indices = np.where(label != 255.0)
 
+    return label[valid_indices], prediction[valid_indices]
+
+
+def compute_mean_iou(pred, label):
     unique_labels = np.unique(label)
-    num_unique_labels = len(unique_labels);
+    num_unique_labels = len(unique_labels)
 
     I = np.zeros(num_unique_labels)
     U = np.zeros(num_unique_labels)
