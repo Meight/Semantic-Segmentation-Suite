@@ -7,7 +7,7 @@
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=8
 #SBATCH --partition=GPUNodes
-#SBATCH --gres=gpu:1
+#SBATCH --gres=gpu:2
 #SBATCH --gres-flags=enforce-binding
 #SBATCH --mem-per-cpu=9000M
 
