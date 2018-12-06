@@ -76,7 +76,7 @@ def mean_image_subtraction(inputs, means=[123.68, 116.78, 103.94]):
     inputs=tf.to_float(inputs)
     num_channels = inputs.get_shape().as_list()[-1]
     if len(means) != num_channels:
-      raise ValueError('len(means) must match the number of channels')
+        raise ValueError('len(means) must match the number of channels')
     channels = tf.split(axis=3, num_or_size_splits=num_channels, value=inputs)
     for i in range(num_channels):
         channels[i] -= means[i]
@@ -133,7 +133,7 @@ def _lovasz_softmax_flat(probas, labels, only_present=True):
         grad = _lovasz_grad(fg_sorted)
         losses.append(
             tf.tensordot(errors_sorted, tf.stop_gradient(grad), 1, name="loss_class_{}".format(c))
-                      )
+        )
     losses_tensor = tf.stack(losses)
     if only_present:
         present = tf.stack(present)
@@ -164,15 +164,39 @@ def lovasz_softmax(probas, labels, only_present=True, per_image=False, ignore=No
     return losses
 
 
+def resize_to_size(image, label, desired_size):
+    if (image.shape[0] != label.shape[0]) or (image.shape[1] != label.shape[1]):
+        raise Exception('Image and label must have the same dimensions!')
+
+    old_size = image.shape[:2]
+    ratio = float(desired_size) / max(old_size)
+
+    new_size = tuple([int(x * ratio) for x in old_size])
+
+    # new_size should be in (width, height) format
+    image = cv2.resize(image, (new_size[1], new_size[0]))
+
+    delta_w = desired_size - new_size[1]
+    delta_h = desired_size - new_size[0]
+    top, bottom = delta_h // 2, delta_h - (delta_h // 2)
+    left, right = delta_w // 2, delta_w - (delta_w // 2)
+    color = [255, 255, 255]
+    image = cv2.copyMakeBorder(image, top, bottom, left, right, cv2.BORDER_CONSTANT,
+                               value=color)
+    label = cv2.copyMakeBorder(label, top, bottom, left, right, cv2.BORDER_CONSTANT,
+                               value=color)
+
+    return image, label
+
 # Randomly crop the image to a specific size. For data augmentation
 def random_crop(image, label, crop_height, crop_width):
     if (image.shape[0] != label.shape[0]) or (image.shape[1] != label.shape[1]):
         raise Exception('Image and label must have the same dimensions!')
-        
+
     if (crop_width <= image.shape[1]) and (crop_height <= image.shape[0]):
         x = random.randint(0, image.shape[1]-crop_width)
         y = random.randint(0, image.shape[0]-crop_height)
-        
+
         if len(label.shape) == 3:
             return image[y:y+crop_height, x:x+crop_width, :], label[y:y+crop_height, x:x+crop_width, :]
         else:
@@ -248,7 +272,7 @@ def evaluate_segmentation(pred, label, num_classes, score_averaging="weighted"):
 
     return global_accuracy, class_accuracies, prec, rec, f1, iou
 
-    
+
 def compute_class_weights(labels_dir, label_values):
     '''
     Arguments:
@@ -263,7 +287,7 @@ def compute_class_weights(labels_dir, label_values):
 
     num_classes = len(label_values)
 
-    class_pixels = np.zeros(num_classes) 
+    class_pixels = np.zeros(num_classes)
 
     total_pixels = 0.0
 
@@ -275,7 +299,7 @@ def compute_class_weights(labels_dir, label_values):
             class_map = class_map.astype(np.float32)
             class_pixels[index] += np.sum(class_map)
 
-            
+
         print("\rProcessing image: " + str(n) + " / " + str(len(image_files)), end="")
         sys.stdout.flush()
 
