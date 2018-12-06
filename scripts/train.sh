@@ -19,7 +19,7 @@ DATASETS_DIR="/projets/thesepizenberg/deep-learning/datasets/VOC2012"
 TENSORBOARD_LOGS_DIR="/projets/thesepizenberg/deep-learning/logs/tensorboard"
 WEIGHTS_SAVE_DIR="/projets/thesepizenberg/deep-learning/models"
 # Misc.
-CHECK_DEPENDENCIES=false
+CHECK_DEPENDENCIES=true
 
 # Begin script.
 
@@ -41,6 +41,7 @@ if [ "$CHECK_DEPENDENCIES" = true ] ; then
     srun keras-py3-tf /users/thesepizenberg/mlebouch/venv/bin/pip3 install tensorflow==1.10.0
     srun keras-py3-tf /users/thesepizenberg/mlebouch/venv/bin/pip3 install keras==2.2.2
     srun keras-py3-tf /users/thesepizenberg/mlebouch/venv/bin/pip3 install matplotlib
+    srun keras-py3-tf /users/thesepizenberg/mlebouch/venv/bin/pip3 install -U scikit-learn
     srun keras-py3-tf /users/thesepizenberg/mlebouch/venv/bin/pip3 list
 fi
 
