@@ -19,7 +19,7 @@ DATASETS_DIR="/projets/thesepizenberg/deep-learning/datasets/VOC2012"
 TENSORBOARD_LOGS_DIR="/projets/thesepizenberg/deep-learning/logs/tensorboard"
 WEIGHTS_SAVE_DIR="/projets/thesepizenberg/deep-learning/models"
 # Misc.
-CHECK_DEPENDENCIES=true
+CHECK_DEPENDENCIES=false
 
 # Begin script.
 
