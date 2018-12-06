@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 # Options SBATCH :
 #SBATCH --job-name=Training
-#SBATCH --output=/projets/thesepizenberg/deep-learning/logs/new-%j.out
-#SBATCH --error=/projets/thesepizenberg/deep-learning/logs/new-%j.out
+#SBATCH --output=/projets/thesepizenberg/deep-learning/logs/densenet-%j.out
+#SBATCH --error=/projets/thesepizenberg/deep-learning/logs/densenet-%j.out
 
 #SBATCH --ntasks=1
-#SBATCH --cpus-per-task=16
+#SBATCH --cpus-per-task=8
 #SBATCH --partition=GPUNodes
-#SBATCH --gres=gpu:4
+#SBATCH --gres=gpu:1
 #SBATCH --gres-flags=enforce-binding
 #SBATCH --mem-per-cpu=9000M
 
@@ -53,8 +53,8 @@ srun keras-py3-tf /users/thesepizenberg/mlebouch/venv/bin/python "$TRAIN_SCRIPT_
                 --checkpoint_step=2 \
                 --validation_step=1 \
                 --dataset=voc-ha \
-                --crop_height=384 \
-                --crop_width=384 \
+                --crop_height=332 \
+                --crop_width=332 \
                 --model=FC-DenseNet56 \
                 --frontend=ResNet101
 wait
