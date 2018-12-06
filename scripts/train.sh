@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # Options SBATCH :
 #SBATCH --job-name=Training
-#SBATCH --output=/projets/thesepizenberg/deep-learning/logs/training-%j.out
-#SBATCH --error=/projets/thesepizenberg/deep-learning/logs/training-%j.out
+#SBATCH --output=/projets/thesepizenberg/deep-learning/logs/new-%j.out
+#SBATCH --error=/projets/thesepizenberg/deep-learning/logs/new-%j.out
 
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=16
