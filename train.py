@@ -170,8 +170,9 @@ if not os.path.exists(results_path):
     os.makedirs(results_path)
 
 headers = ['epoch', 'avg_accuracy', 'precision', 'recall', 'f1', 'miou']
-header_format = '{:15}' * len(headers)
-row_format = '{:15.12f}' * len(headers)
+
+header_format = '{:13}' * len(headers)
+row_format = '{:2.4f}' * len(headers)
 with open(os.path.join(results_path, "results.txt"), "a+") as results_file:
     results_file.write(header_format.format(*headers))
 
