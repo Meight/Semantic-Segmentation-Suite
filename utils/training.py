@@ -82,18 +82,25 @@ def get_labels_from_annotation_batch(annotation_batch_tensor, class_labels):
 
 
 def get_valid_entries_indices_from_annotation_batch(annotation_batch_tensor):
+    mask_out_class_label = 255.0
 
+    valid_labels_mask = tf.not_equal(annotation_batch_tensor,
+                                     mask_out_class_label)
+
+    valid_labels_indices = tf.where(valid_labels_mask)
 
     return tf.to_int32(valid_labels_indices)
 
 
 def get_valid_logits_and_labels(labels, logits):
-    mask_out_class_label = 255.0
-    valid_labels_mask = tf.not_equal(labels, mask_out_class_label)
+    labels = tf.squeeze(labels)
+    logits = tf.squeeze(logits)
 
-    mask = tf.where(valid_labels_mask)
+    valid_batch_indices = get_valid_entries_indices_from_annotation_batch(
+        annotation_batch_tensor=labels)
 
-    valid_labels_batch_tensor = tf.boolean_mask(labels, mask)
-    valid_logits_batch_tensor = tf.boolean_mask(logits, mask)
+    valid_labels_batch_tensor = tf.gather_nd(params=labels, indices=valid_batch_indices)
+
+    valid_logits_batch_tensor = tf.gather_nd(params=logits, indices=valid_batch_indices)
 
     return valid_labels_batch_tensor, valid_logits_batch_tensor
