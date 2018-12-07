@@ -34,6 +34,10 @@ def get_label_info(csv_path):
     return class_names, label_values
 
 
+def one_hot_batch(labels_batch, labels_values):
+    return np.stack([one_hot_it(label=label, label_values=labels_values) for label in labels_batch])
+
+
 def one_hot_it(label, label_values):
     """
     Convert a segmentation image label array to one-hot format

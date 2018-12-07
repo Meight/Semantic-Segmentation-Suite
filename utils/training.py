@@ -1,6 +1,7 @@
 import tensorflow as tf
 
 from utils import helpers
+from utils.helpers import one_hot_it
 
 
 def get_labels_from_annotation(annotation_tensor, class_labels):
@@ -51,32 +52,14 @@ def get_labels_from_annotation(annotation_tensor, class_labels):
 
 
 def get_labels_from_annotation_batch(annotation_batch_tensor, class_labels):
-    """Returns tensor of size (batch_size, width, height, num_classes) derived
-    from annotation batch tensor. The function returns tensor that is of a size
-    (batch_size, width, height, num_classes) which is derived from annotation tensor
-    with sizes (batch_size, width, height) where value at each position represents a class.
-    The functions requires a list with class values like [0, 1, 2 ,3] -- they are
-    used to derive labels. Derived values will be ordered in the same way as
-    the class numbers were provided in the list. Last value in the aforementioned
-    list represents a value that indicate that the pixel should be masked out.
-    So, the size of num_classes len(class_labels) - 1.
-
-    Parameters
-    ----------
-    annotation_batch_tensor : Tensor of size (batch_size, width, height)
-        Tensor with class labels for each element
-    class_labels : list of ints
-        List that contains the numbers that represent classes. Last
-        value in the list should represent the number that was used
-        for masking out.
-
+    """
     Returns
     -------
     batch_labels : Tensor of size (batch_size, width, height, num_classes).
         Tensor with labels for each batch.
     """
 
-    batch_labels = tf.map_fn(fn=lambda x: get_labels_from_annotation(annotation_tensor=x, class_labels=class_labels),
+    batch_labels = tf.map_fn(fn=lambda x: one_hot_it(label=x, label_values=class_labels),
                              elems=annotation_batch_tensor,
                              dtype=tf.float32)
 
@@ -94,14 +77,15 @@ def get_valid_entries_indices_from_annotation_batch(annotation_batch_tensor):
     return tf.to_int32(valid_labels_indices)
 
 
-def get_valid_logits_and_labels(labels, logits, labels_values):
-    labels = helpers.one_hot_it(label=labels, label_values=labels_values)
+def get_valid_logits_and_labels(labels, logits_batch, labels_values):
+    labels_batch_tensor = get_labels_from_annotation_batch(annotation_batch_tensor=labels,
+                                                           class_labels=labels_values)
 
     valid_batch_indices = get_valid_entries_indices_from_annotation_batch(
         annotation_batch_tensor=labels)
 
-    valid_labels_batch_tensor = tf.gather_nd(params=labels, indices=valid_batch_indices)
+    valid_labels_batch_tensor = tf.gather_nd(params=labels_batch_tensor, indices=valid_batch_indices)
 
-    valid_logits_batch_tensor = tf.gather_nd(params=logits, indices=valid_batch_indices)
+    valid_logits_batch_tensor = tf.gather_nd(params=logits_batch, indices=valid_batch_indices)
 
     return valid_labels_batch_tensor, valid_logits_batch_tensor

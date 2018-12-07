@@ -98,7 +98,7 @@ net_output = tf.placeholder(tf.float32,shape=[None,None,None,num_classes])
 
 network, init_fn = model_builder.build_model(model_name=args.model, frontend=args.frontend, net_input=net_input, num_classes=num_classes, crop_width=args.crop_width, crop_height=args.crop_height, is_training=True)
 
-valid_labels, valid_logits = get_valid_logits_and_labels(labels=net_output, logits=network, labels_values=label_values)
+valid_labels, valid_logits = get_valid_logits_and_labels(labels=net_output, logits_batch=network, labels_values=label_values)
 print(tf.shape(valid_labels), tf.shape(valid_logits))
 loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits_v2(logits=valid_logits, labels=valid_labels))
 
