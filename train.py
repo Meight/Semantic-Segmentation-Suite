@@ -173,8 +173,8 @@ headers = ['epoch', 'avg_accuracy', 'precision', 'recall', 'f1', 'miou']
 
 column_margin = 2
 column_width = len(max(headers, key=len)) + column_margin
-header_format = '{:<12}' * len(headers)
-row_format = '{:<12.3f}' * len(headers)
+header_format = '{:<13}' * len(headers)
+row_format = '{:<13.3f}' * len(headers)
 with open(os.path.join(results_path, "results.txt"), "a+") as results_file:
     results_file.write(header_format.format(*headers))
 
