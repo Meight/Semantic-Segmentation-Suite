@@ -100,7 +100,12 @@ network, init_fn = model_builder.build_model(model_name=args.model, frontend=arg
 
 valid_labels, valid_logits = get_valid_logits_and_labels(labels_batch=net_output, logits_batch=network)
 print(tf.shape(valid_labels), tf.shape(valid_logits))
-loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits_v2(logits=valid_logits, labels=valid_labels))
+
+unc = tf.where(tf.equal(net_output, 255), tf.zeros_like(net_output), tf.ones_like(net_output))
+loss = tf.losses.compute_weighted_loss(weights = tf.cast(unc, tf.float32),
+                                       losses = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits_v2(
+                                           logits = network,
+                                           labels = net_output)))
 
 opt = tf.train.RMSPropOptimizer(learning_rate=0.0001, decay=0.995).minimize(loss, var_list=[var for var in tf.trainable_variables()])
 
