@@ -255,9 +255,9 @@ for epoch in range(args.epoch_start_i, args.num_epochs):
             output_image = helpers.reverse_one_hot(output_image)
             out_vis_image = helpers.colour_code_segmentation(output_image, label_values)
 
-            valid_label, output_image = utils.filter_valid_entries(prediction=output_image, label=gt)
-            accuracy, class_accuracies, prec, rec, f1, iou = utils.evaluate_segmentation(pred=output_image,
-                                                                                         label=valid_label,
+            valid_labels, valid_predictions = utils.filter_valid_entries(prediction=output_image, label=gt)
+            accuracy, class_accuracies, prec, rec, f1, iou = utils.evaluate_segmentation(pred=valid_predictions,
+                                                                                         label=valid_labels,
                                                                                          num_classes=num_classes)
 
             file_name = utils.filepath_to_name(val_input_names[ind])

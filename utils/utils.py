@@ -240,7 +240,7 @@ def compute_class_accuracies(pred, label, num_classes):
 
 
 def filter_valid_entries(prediction, label):
-    valid_indices = np.where(label != (255.0, 255.0, 255.0))
+    valid_indices = np.where(label != 255)
 
     return label[valid_indices], prediction[valid_indices]
 
