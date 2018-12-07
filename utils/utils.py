@@ -176,9 +176,7 @@ def resize_to_size(image, label = None, desired_size = 256):
 
     # new_size should be in (width, height) format
     image = cv2.resize(image, (new_size[1], new_size[0]))
-
-    if label is not None:
-        label = cv2.resize(label, (new_size[1], new_size[0]))
+    label = cv2.resize(label, (new_size[1], new_size[0]))
 
     delta_w = desired_size - new_size[1]
     delta_h = desired_size - new_size[0]
@@ -187,10 +185,8 @@ def resize_to_size(image, label = None, desired_size = 256):
     color = [255, 255, 255]
     image = cv2.copyMakeBorder(image, top, bottom, left, right, cv2.BORDER_CONSTANT,
                                value=color)
-
-    if label is not None:
-        label = cv2.copyMakeBorder(label, top, bottom, left, right, cv2.BORDER_CONSTANT,
-                                   value=color)
+    label = cv2.copyMakeBorder(label, top, bottom, left, right, cv2.BORDER_CONSTANT,
+                               value=color)
 
     return image, label
 

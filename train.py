@@ -241,9 +241,8 @@ for epoch in range(args.epoch_start_i, args.num_epochs):
         for ind in val_indices:
 
             input_image = np.expand_dims(np.float32(utils.load_image(val_input_names[ind])),axis=0)/255.0
-            input_image, _ = utils.resize_to_size(input_image, desired_size=args.input_size)
             gt = utils.load_image(val_output_names[ind])
-            gt, _ = utils.resize_to_size(gt, desired_size=args.input_size)
+            input_image, gt = utils.resize_to_size(input_image, gt, desired_size=args.input_size)
             gt = helpers.reverse_one_hot(helpers.one_hot_it(gt, label_values))
 
             # st = time.time()
