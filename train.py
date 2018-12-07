@@ -272,7 +272,7 @@ for epoch in range(args.epoch_start_i, args.num_epochs):
             gt = helpers.reverse_one_hot(helpers.one_hot_it(gt, label_values))
 
             valid_indices = np.where(np.sum(gt, axis=-1) != 0)
-            valid_labels = gt[valid_indices, :]
+            gt = gt[valid_indices, :]
 
             # st = time.time()
 
