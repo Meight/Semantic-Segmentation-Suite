@@ -98,8 +98,8 @@ net_output = tf.placeholder(tf.float32,shape=[None,None,None,num_classes])
 
 network, init_fn = model_builder.build_model(model_name=args.model, frontend=args.frontend, net_input=net_input, num_classes=num_classes, crop_width=args.crop_width, crop_height=args.crop_height, is_training=True)
 
-valid_labels, valid_logits = get_valid_logits_and_labels(labels=net_output, logits=network)
-loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits_v2(logits=valid_logits, labels=valid_labels))
+# valid_labels, valid_logits = get_valid_logits_and_labels(labels=net_output, logits=network)
+loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits_v2(logits=network, labels=net_output))
 
 opt = tf.train.RMSPropOptimizer(learning_rate=0.00001, decay=0.995).minimize(loss, var_list=[var for var in tf.trainable_variables()])
 
