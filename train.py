@@ -313,7 +313,7 @@ for epoch in range(args.epoch_start_i, args.num_epochs):
         avg_iou_per_epoch.append(avg_iou)
 
         with open(os.path.join(results_path, "results.txt"), "a+") as results_file:
-            results_file.write(row_format.format(epoch, avg_score, avg_precision, avg_recall, avg_f1, avg_iou))
+            results_file.write("\n" + row_format.format(epoch, avg_score, avg_precision, avg_recall, avg_f1, avg_iou))
 
         print(header_format.format(*headers))
         print(row_format.format(epoch, avg_score, avg_precision, avg_recall, avg_f1, avg_iou))
