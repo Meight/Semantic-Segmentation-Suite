@@ -166,6 +166,9 @@ random.seed(16)
 val_indices=random.sample(range(0,len(val_input_names)),num_vals)
 results_path = "%s/%s/%s" % ("results", args.model, args.frontend)
 
+if not os.path.exists(results_path):
+    os.makedirs(results_path)
+
 headers = ['epoch', 'avg_accuracy', 'precision', 'recall', 'f1', 'miou']
 header_format = '{:10}' * len(headers)
 row_format = '{:10.7f}' * len(headers)
