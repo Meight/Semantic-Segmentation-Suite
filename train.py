@@ -167,7 +167,7 @@ num_vals = min(args.num_val_images, len(val_input_names))
 random.seed(16)
 val_indices=random.sample(range(0,len(val_input_names)),num_vals)
 results_path = "%s/%s/%s" % ("results", args.model, args.frontend)
-results_filename = "results-{}.txt".format('augmented' if is_dataset_augmented else 'non-augmented')
+results_filename = "results-{}-{}.txt".format(args.input_size, 'augmented' if is_dataset_augmented else 'non-augmented')
 
 if not os.path.exists(results_path):
     os.makedirs(results_path)
