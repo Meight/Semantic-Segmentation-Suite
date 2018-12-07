@@ -280,10 +280,11 @@ for epoch in range(args.epoch_start_i, args.num_epochs):
 
 
             output_image = np.array(output_image[0,:,:,:])
+            out_vis_image = helpers.colour_code_segmentation(output_image, label_values)
+
             output_image = output_image[valid_indices, :]
 
             output_image = helpers.reverse_one_hot(output_image)
-            out_vis_image = helpers.colour_code_segmentation(output_image, label_values)
 
             accuracy, class_accuracies, prec, rec, f1, iou = utils.evaluate_segmentation(pred=output_image,
                                                                                          label=gt,
