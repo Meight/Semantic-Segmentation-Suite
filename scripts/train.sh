@@ -48,7 +48,7 @@ wait
 
 
 srun keras-py3-tf /users/thesepizenberg/mlebouch/venv/bin/python "$TRAIN_SCRIPT_DIR/train.py" \
-                --num_epochs=200 \
+                --num_epochs=50 \
                 --checkpoint_step=2 \
                 --validation_step=1 \
                 --dataset=voc-ha \
@@ -56,5 +56,5 @@ srun keras-py3-tf /users/thesepizenberg/mlebouch/venv/bin/python "$TRAIN_SCRIPT_
                 --crop_width=256 \
                 --input_size=256 \
                 --model=${1} \
-                --frontend=ResNet101
+                --frontend=${2}
 wait
