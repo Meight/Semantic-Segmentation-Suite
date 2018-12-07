@@ -31,6 +31,7 @@ def str2bool(v):
         raise argparse.ArgumentTypeError('Boolean value expected.')
 
 parser = argparse.ArgumentParser()
+parser.add_argument('--learning_rate', type=float, default=0.0001, help='Learning rate to use')
 parser.add_argument('--num_epochs', type=int, default=300, help='Number of epochs to train for')
 parser.add_argument('--epoch_start_i', type=int, default=0, help='Start counting epochs from this number')
 parser.add_argument('--checkpoint_step', type=int, default=5, help='How often to save checkpoints (epochs)')
@@ -52,22 +53,25 @@ parser.add_argument('--frontend', type=str, default="ResNet101", help='The front
 args = parser.parse_args()
 
 
+is_dataset_augmented = args.h_flip or args.v_flip or (args.brightness is not None) or (args.rotation is not None)
+
+
 def data_augmentation(input_image, output_image):
     # Data augmentation
     input_image, output_image = utils.resize_to_size(input_image, output_image, args.input_size)
 
-    if args.h_flip and random.randint(0,1):
+    if args.h_flip and random.randint(0, 1):
         input_image = cv2.flip(input_image, 1)
         output_image = cv2.flip(output_image, 1)
-    if args.v_flip and random.randint(0,1):
+    if args.v_flip and random.randint(0, 1):
         input_image = cv2.flip(input_image, 0)
         output_image = cv2.flip(output_image, 0)
     if args.brightness:
-        factor = 1.0 + random.uniform(-1.0*args.brightness, args.brightness)
+        factor = 1.0 + random.uniform(-1.0 * args.brightness, args.brightness)
         table = np.array([((i / 255.0) * factor) * 255 for i in np.arange(0, 256)]).astype(np.uint8)
         input_image = cv2.LUT(input_image, table)
     if args.rotation:
-        angle = random.uniform(-1*args.rotation, args.rotation)
+        angle = random.uniform(-1 * args.rotation, args.rotation)
     if args.rotation:
         M = cv2.getRotationMatrix2D((input_image.shape[1]//2, input_image.shape[0]//2), angle, 1.0)
         input_image = cv2.warpAffine(input_image, M, (input_image.shape[1], input_image.shape[0]), flags=cv2.INTER_NEAREST)
@@ -98,10 +102,6 @@ net_output = tf.placeholder(tf.float32, shape=[None, None, None, num_classes])
 
 network, init_fn = model_builder.build_model(model_name=args.model, frontend=args.frontend, net_input=net_input, num_classes=num_classes, crop_width=args.crop_width, crop_height=args.crop_height, is_training=True)
 
-valid_labels, valid_logits = get_valid_logits_and_labels(labels_batch=net_output, logits_batch=network)
-print(tf.shape(valid_labels), tf.shape(valid_logits))
-
-
 weights_shape = (args.batch_size, args.input_size, args.input_size)
 unc = tf.where(tf.equal(tf.reduce_sum(net_output, axis=-1), 0),
                tf.zeros(shape=weights_shape),
@@ -112,7 +112,7 @@ loss = tf.reduce_mean(tf.losses.compute_weighted_loss(weights = tf.cast(unc, tf.
                                            logits = network,
                                            labels = net_output)))
 
-opt = tf.train.RMSPropOptimizer(learning_rate=0.0001, decay=0.995).minimize(loss, var_list=[var for var in tf.trainable_variables()])
+opt = tf.train.RMSPropOptimizer(learning_rate=args.learning_rate, decay=0.995).minimize(loss, var_list=[var for var in tf.trainable_variables()])
 
 saver=tf.train.Saver(max_to_keep=1000)
 sess.run(tf.global_variables_initializer())
@@ -139,10 +139,12 @@ train_input_names,train_output_names, val_input_names, val_output_names, test_in
 print("\n***** Begin training *****")
 print("Dataset -->", args.dataset)
 print("Model -->", args.model)
+print("Front-end -->", args.frontend)
 print("Crop Height -->", args.crop_height)
 print("Crop Width -->", args.crop_width)
 print("Num Epochs -->", args.num_epochs)
 print("Batch Size -->", args.batch_size)
+print("Learning rate -->", args.learning_rate)
 print("Num Classes -->", num_classes)
 
 print("Data Augmentation:")
@@ -165,6 +167,7 @@ num_vals = min(args.num_val_images, len(val_input_names))
 random.seed(16)
 val_indices=random.sample(range(0,len(val_input_names)),num_vals)
 results_path = "%s/%s/%s" % ("results", args.model, args.frontend)
+results_filename = "results-{}.txt".format('augmented' if is_dataset_augmented else 'non-augmented')
 
 if not os.path.exists(results_path):
     os.makedirs(results_path)
@@ -175,7 +178,8 @@ column_margin = 2
 column_width = len(max(headers, key=len)) + column_margin
 header_format = '{:<13}' * len(headers)
 row_format = '{:<13.3f}' * len(headers)
-with open(os.path.join(results_path, "results.txt"), "a+") as results_file:
+with open(os.path.join(results_path, results_filename),
+          "a+") as results_file:
     results_file.write(header_format.format(*headers))
 
 # Do the training here
@@ -235,7 +239,11 @@ for epoch in range(args.epoch_start_i, args.num_epochs):
     mean_loss = np.mean(current_losses)
     avg_loss_per_epoch.append(mean_loss)
 
-    epoch_checkpoints_path = "%s/%s/%s/%04d" % ("checkpoints", args.model, args.frontend, epoch)
+    epoch_checkpoints_path = "%s/%s/%s/%s/%04d" % ("checkpoints",
+                                                   args.model,
+                                                   args.frontend,
+                                                   'augmented' if is_dataset_augmented else 'non-augmented',
+                                                   epoch)
     # Create directories if needed
     if not os.path.isdir(epoch_checkpoints_path):
         os.makedirs(epoch_checkpoints_path)
@@ -254,14 +262,12 @@ for epoch in range(args.epoch_start_i, args.num_epochs):
         target = open(os.path.join(epoch_checkpoints_path, "val_scores.csv"),'w')
         target.write("val_name, avg_accuracy, precision, recall, f1 score, mean iou, %s\n" % (class_names_string))
 
-
         scores_list = []
         class_scores_list = []
         precision_list = []
         recall_list = []
         f1_list = []
         iou_list = []
-
 
         # Do the validation on a small set of validation images
         for ind in val_indices:
@@ -312,7 +318,7 @@ for epoch in range(args.epoch_start_i, args.num_epochs):
         avg_iou = np.mean(iou_list)
         avg_iou_per_epoch.append(avg_iou)
 
-        with open(os.path.join(results_path, "results.txt"), "a+") as results_file:
+        with open(os.path.join(results_path, results_filename), "a+") as results_file:
             results_file.write("\n" + row_format.format(epoch, avg_score, avg_precision, avg_recall, avg_f1, avg_iou))
 
         print(header_format.format(*headers))

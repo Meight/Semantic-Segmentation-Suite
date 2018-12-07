@@ -51,11 +51,14 @@ srun keras-py3-tf /users/thesepizenberg/mlebouch/venv/bin/python "$TRAIN_SCRIPT_
                 --num_epochs=150 \
                 --checkpoint_step=2 \
                 --validation_step=1 \
-                --num_val_images=100 \
+                --num_val_images=200 \
                 --dataset=voc-ha \
-                --crop_height=512 \
-                --crop_width=512 \
-                --input_size=512 \
+                --crop_height=256 \
+                --crop_width=256 \
+                --input_size=256 \
+                --h_flip=yes \
+                --brightness=0.1 \
+                --rotation=5 \
                 --model=${1} \
                 --frontend=${2}
 wait
