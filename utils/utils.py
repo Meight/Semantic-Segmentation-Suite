@@ -268,6 +268,8 @@ def evaluate_segmentation(pred, label, num_classes, score_averaging="weighted"):
     flat_pred = pred.flatten()
     flat_label = label.flatten()
 
+    print('============================================', len(flat_label), len(flat_pred))
+
     global_accuracy = compute_global_accuracy(flat_pred, flat_label)
     class_accuracies = compute_class_accuracies(flat_pred, flat_label, num_classes)
 
