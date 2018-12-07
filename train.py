@@ -101,7 +101,7 @@ network, init_fn = model_builder.build_model(model_name=args.model, frontend=arg
 valid_labels, valid_logits = get_valid_logits_and_labels(labels=net_output, logits=network)
 loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits_v2(logits=valid_logits, labels=valid_labels))
 
-opt = tf.train.RMSPropOptimizer(learning_rate=0.0001, decay=0.995).minimize(loss, var_list=[var for var in tf.trainable_variables()])
+opt = tf.train.RMSPropOptimizer(learning_rate=0.00001, decay=0.995).minimize(loss, var_list=[var for var in tf.trainable_variables()])
 
 saver=tf.train.Saver(max_to_keep=1000)
 sess.run(tf.global_variables_initializer())
