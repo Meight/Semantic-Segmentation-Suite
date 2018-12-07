@@ -77,12 +77,9 @@ def get_valid_entries_indices_from_annotation_batch(annotation_batch_tensor):
     return tf.to_int32(valid_labels_indices)
 
 
-def get_valid_logits_and_labels(labels_batch, logits_batch, labels_values):
-    valid_batch_indices = get_valid_entries_indices_from_annotation_batch(
-        annotation_batch_tensor=labels_batch)
-
-    valid_labels_batch_tensor = tf.gather_nd(params=labels_batch, indices=valid_batch_indices)
-
-    valid_logits_batch_tensor = tf.gather_nd(params=logits_batch, indices=valid_batch_indices)
+def get_valid_logits_and_labels(labels_batch, logits_batch):
+    comparison = tf.equal(labels_batch, 255)
+    valid_labels_batch_tensor = tf.where(comparison, tf.zeros_like(labels_batch), labels_batch)
+    valid_logits_batch_tensor = tf.where(comparison, tf.zeros_like(logits_batch), logits_batch)
 
     return valid_labels_batch_tensor, valid_logits_batch_tensor
