@@ -4,6 +4,7 @@ import tensorflow as tf
 import tensorflow.contrib.slim as slim
 import numpy as np
 import time, datetime
+from PIL import Image
 import os, random
 from scipy.misc import imread
 import ast
@@ -327,3 +328,7 @@ def memory():
     memoryUse = py.memory_info()[0]/2.**30  # Memory use in GB
     print('Memory usage in GBs:', memoryUse)
 
+
+def save_image(npdata, out_filename):
+    image = Image.fromarray(npdata)
+    image.save(out_filename)
