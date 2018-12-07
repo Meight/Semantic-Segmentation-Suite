@@ -102,8 +102,8 @@ valid_labels, valid_logits = get_valid_logits_and_labels(labels_batch=net_output
 print(tf.shape(valid_labels), tf.shape(valid_logits))
 
 unc = tf.where(tf.equal(net_output, 255), tf.zeros_like(net_output), tf.ones_like(net_output))
-loss = tf.losses.compute_weighted_loss(weights = tf.cast(unc, tf.float32),
-                                       losses = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits_v2(
+loss = tf.reduce_mean(tf.losses.compute_weighted_loss(weights = tf.cast(unc, tf.float32),
+                                       losses = tf.nn.softmax_cross_entropy_with_logits_v2(
                                            logits = network,
                                            labels = net_output)))
 
