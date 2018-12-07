@@ -164,7 +164,7 @@ num_vals = min(args.num_val_images, len(val_input_names))
 # So you can compare the results of different models more intuitively.
 random.seed(16)
 val_indices=random.sample(range(0,len(val_input_names)),num_vals)
-results_path = "%s/%s" % ("results", args.model)
+results_path = "%s/%s/%s" % ("results", args.model, args.frontend)
 
 headers = ['epoch', 'avg_accuracy', 'precision', 'recall', 'f1', 'miou']
 header_format = '{:10}' * len(headers)
@@ -228,7 +228,7 @@ for epoch in range(args.epoch_start_i, args.num_epochs):
     mean_loss = np.mean(current_losses)
     avg_loss_per_epoch.append(mean_loss)
 
-    epoch_checkpoints_path = "%s/%s/%04d" % ("checkpoints", args.model, epoch)
+    epoch_checkpoints_path = "%s/%s/%s/%04d" % ("checkpoints", args.model, args.frontend, epoch)
     # Create directories if needed
     if not os.path.isdir(epoch_checkpoints_path):
         os.makedirs(epoch_checkpoints_path)
