@@ -101,7 +101,12 @@ network, init_fn = model_builder.build_model(model_name=args.model, frontend=arg
 valid_labels, valid_logits = get_valid_logits_and_labels(labels_batch=net_output, logits_batch=network)
 print(tf.shape(valid_labels), tf.shape(valid_logits))
 
-unc = tf.where(tf.equal(net_output, 255), tf.zeros_like(net_output), tf.ones_like(net_output))
+
+weights_shape = (args.batch_size, args.input_size, args.input_size)
+unc = tf.where(tf.equal(tf.reduce_sum(net_output, axis=-1), 0),
+               tf.zeros(shape=weights_shape),
+               tf.ones(shape=weights_shape))
+
 loss = tf.reduce_mean(tf.losses.compute_weighted_loss(weights = tf.cast(unc, tf.float32),
                                        losses = tf.nn.softmax_cross_entropy_with_logits_v2(
                                            logits = network,

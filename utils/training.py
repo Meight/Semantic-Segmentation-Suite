@@ -78,11 +78,8 @@ def get_valid_entries_indices_from_annotation_batch(annotation_batch_tensor):
 
 
 def get_valid_logits_and_labels(labels_batch, logits_batch):
-    raw_prediction = tf.reshape(logits_batch, [-1, 3])
-    gt = tf.reshape(labels_batch, [-1])
-    # supposed 2 is the ignored label
-    indices = tf.squeeze(tf.where(tf.not_equal(gt, 255)), 1)
-    gt = tf.cast(tf.gather(gt, indices), tf.int32)
-    prediction = tf.gather(raw_prediction, indices)
+    comparison = tf.equal(labels_batch, 255)
+    valid_labels_batch_tensor = tf.where(comparison, tf.zeros_like(labels_batch), labels_batch)
+    valid_logits_batch_tensor = tf.where(comparison, tf.zeros_like(logits_batch), logits_batch)
 
-    return gt, prediction
+    return valid_labels_batch_tensor, valid_logits_batch_tensor
