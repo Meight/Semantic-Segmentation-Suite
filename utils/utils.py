@@ -167,7 +167,7 @@ def lovasz_softmax(probas, labels, only_present=True, per_image=False, ignore=No
 
 def resize_to_size(image, label = None, desired_size = 256):
     if (image.shape[0] != label.shape[0]) or (image.shape[1] != label.shape[1]):
-        raise Exception('Image and label must have the same dimensions!')
+        raise Exception('Image and label must have the same dimensions! {} vs {}'.format(image.shape, label.shape))
 
     old_size = image.shape[:2]
     ratio = float(desired_size) / max(old_size)

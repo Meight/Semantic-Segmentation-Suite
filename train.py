@@ -240,9 +240,10 @@ for epoch in range(args.epoch_start_i, args.num_epochs):
         # Do the validation on a small set of validation images
         for ind in val_indices:
 
-            input_image = np.expand_dims(np.float32(utils.load_image(val_input_names[ind])),axis=0)/255.0
+            input_image = np.float32(utils.load_image(val_input_names[ind]))
             gt = utils.load_image(val_output_names[ind])
             input_image, gt = utils.resize_to_size(input_image, gt, desired_size=args.input_size)
+            input_image = np.expand_dims(input_image, axis=0) / 255.0
             gt = helpers.reverse_one_hot(helpers.one_hot_it(gt, label_values))
 
             # st = time.time()
