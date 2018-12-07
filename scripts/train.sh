@@ -53,9 +53,9 @@ srun keras-py3-tf /users/thesepizenberg/mlebouch/venv/bin/python "$TRAIN_SCRIPT_
                 --validation_step=1 \
                 --num_val_images=100 \
                 --dataset=voc-ha \
-                --crop_height=256 \
-                --crop_width=256 \
-                --input_size=256 \
+                --crop_height=512 \
+                --crop_width=512 \
+                --input_size=512 \
                 --model=${1} \
                 --frontend=${2}
 wait
