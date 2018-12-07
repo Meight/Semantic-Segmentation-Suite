@@ -5,7 +5,7 @@
 #SBATCH --error=/projets/thesepizenberg/deep-learning/logs/densenet-%j.out
 
 #SBATCH --ntasks=1
-#SBATCH --cpus-per-task=8
+#SBATCH --cpus-per-task=5
 #SBATCH --partition=GPUNodes
 #SBATCH --gres=gpu:1
 #SBATCH --mem-per-cpu=9000M
