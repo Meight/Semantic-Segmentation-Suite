@@ -269,18 +269,22 @@ for epoch in range(args.epoch_start_i, args.num_epochs):
             input_image = np.expand_dims(input_image, axis=0) / 255.0
             gt = helpers.reverse_one_hot(helpers.one_hot_it(gt, label_values))
 
+            valid_indices = np.where(np.sum(gt, axis=-1) != 0)
+            valid_labels = gt[valid_indices]
+
             # st = time.time()
 
             output_image = sess.run(network,feed_dict={net_input:input_image})
 
 
             output_image = np.array(output_image[0,:,:,:])
+            output_image = output_image[valid_indices]
+
             output_image = helpers.reverse_one_hot(output_image)
             out_vis_image = helpers.colour_code_segmentation(output_image, label_values)
 
-            valid_labels, valid_predictions = utils.filter_valid_entries(prediction=output_image, label=gt)
-            accuracy, class_accuracies, prec, rec, f1, iou = utils.evaluate_segmentation(pred=valid_predictions,
-                                                                                         label=valid_labels,
+            accuracy, class_accuracies, prec, rec, f1, iou = utils.evaluate_segmentation(pred=output_image,
+                                                                                         label=gt,
                                                                                          num_classes=num_classes)
 
             file_name = utils.filepath_to_name(val_input_names[ind])
