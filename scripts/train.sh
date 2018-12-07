@@ -48,7 +48,9 @@ wait
 
 
 srun keras-py3-tf /users/thesepizenberg/mlebouch/venv/bin/python "$TRAIN_SCRIPT_DIR/train.py" \
-                --num_epochs=50 \
+                --epoch_start_i=50 \
+                --continue_training=yes \
+                --num_epochs=40 \
                 --checkpoint_step=2 \
                 --validation_step=1 \
                 --dataset=voc-ha \
