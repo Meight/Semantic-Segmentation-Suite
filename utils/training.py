@@ -1,5 +1,7 @@
 import tensorflow as tf
 
+from utils import helpers
+
 
 def get_labels_from_annotation(annotation_tensor, class_labels):
     """Returns tensor of size (width, height, num_classes) derived from annotation tensor.
@@ -92,9 +94,8 @@ def get_valid_entries_indices_from_annotation_batch(annotation_batch_tensor):
     return tf.to_int32(valid_labels_indices)
 
 
-def get_valid_logits_and_labels(labels, logits):
-    labels = tf.squeeze(labels)
-    logits = tf.squeeze(logits)
+def get_valid_logits_and_labels(labels, logits, labels_values):
+    labels = helpers.one_hot_it(label=labels, label_values=labels_values)
 
     valid_batch_indices = get_valid_entries_indices_from_annotation_batch(
         annotation_batch_tensor=labels)
