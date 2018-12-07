@@ -280,10 +280,7 @@ for epoch in range(args.epoch_start_i, args.num_epochs):
 
 
             output_image = np.array(output_image[0,:,:,:])
-            out_vis_image = helpers.colour_code_segmentation(output_image, label_values)
-
             output_image = output_image[valid_indices, :]
-
             output_image = helpers.reverse_one_hot(output_image)
 
             accuracy, class_accuracies, prec, rec, f1, iou = utils.evaluate_segmentation(pred=output_image,
@@ -302,12 +299,6 @@ for epoch in range(args.epoch_start_i, args.num_epochs):
             recall_list.append(rec)
             f1_list.append(f1)
             iou_list.append(iou)
-
-            gt = helpers.colour_code_segmentation(gt, label_values)
-
-            file_name = os.path.basename(val_input_names[ind])
-            file_name = os.path.splitext(file_name)[0]
-
 
         target.close()
 
