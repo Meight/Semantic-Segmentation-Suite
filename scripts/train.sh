@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # Options SBATCH :
-#SBATCH --job-name=Deeplab
-#SBATCH --output=/projets/thesepizenberg/deep-learning/logs/deeplab-%j.out
-#SBATCH --error=/projets/thesepizenberg/deep-learning/logs/deeplab-%j.out
+#SBATCH --job-name=densenet
+#SBATCH --output=/projets/thesepizenberg/deep-learning/logs/densenet-%j.out
+#SBATCH --error=/projets/thesepizenberg/deep-learning/logs/densenet-%j.out
 
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=8
@@ -53,9 +53,9 @@ srun keras-py3-tf /users/thesepizenberg/mlebouch/venv/bin/python "$TRAIN_SCRIPT_
                 --checkpoint_step=2 \
                 --validation_step=1 \
                 --dataset=voc-ha \
-                --crop_height=384 \
-                --crop_width=384 \
-                --input_size=384 \
-                --model=DeepLabV3_plus \
+                --crop_height=256 \
+                --crop_width=256 \
+                --input_size=256 \
+                --model=FC-DenseNet56 \
                 --frontend=ResNet101
 wait
