@@ -164,6 +164,13 @@ num_vals = min(args.num_val_images, len(val_input_names))
 # So you can compare the results of different models more intuitively.
 random.seed(16)
 val_indices=random.sample(range(0,len(val_input_names)),num_vals)
+results_path = "%s/%s" % ("results", args.model)
+
+headers = ['epoch', 'avg_accuracy', 'precision', 'recall', 'f1', 'miou']
+header_format = '{:10}' * len(headers)
+row_format = '{:10.7f}' * len(headers)
+with open(os.path.join(results_path, "results.txt"), "a+") as results_file:
+    results_file.write(header_format.format(*headers))
 
 # Do the training here
 for epoch in range(args.epoch_start_i, args.num_epochs):
@@ -305,6 +312,11 @@ for epoch in range(args.epoch_start_i, args.num_epochs):
         avg_iou = np.mean(iou_list)
         avg_iou_per_epoch.append(avg_iou)
 
+        with open(os.path.join(results_path, "results.txt"), "a+") as results_file:
+            results_file.write(row_format.format(epoch, avg_score, avg_precision, avg_recall, avg_f1, avg_iou))
+
+        print(header_format.format(*headers))
+        print(row_format.format(epoch, avg_score, avg_precision, avg_recall, avg_f1, avg_iou))
         print("\nAverage validation accuracy for epoch # %04d = %f"% (epoch, avg_score))
         print("Average per class validation accuracies for epoch # %04d:"% (epoch))
         for index, item in enumerate(class_avg_scores):
@@ -325,7 +337,6 @@ for epoch in range(args.epoch_start_i, args.num_epochs):
     utils.LOG(train_time)
     scores_list = []
 
-
     fig1, ax1 = plt.subplots(figsize=(11, 8))
 
     ax1.plot(range(epoch+1), avg_scores_per_epoch)
@@ -334,7 +345,7 @@ for epoch in range(args.epoch_start_i, args.num_epochs):
     ax1.set_ylabel("Avg. val. accuracy")
 
 
-    plt.savefig('accuracy_vs_epochs.png')
+    plt.savefig(os.path.join(results_path, 'accuracy_vs_epochs.png'))
 
     plt.clf()
 
@@ -345,7 +356,7 @@ for epoch in range(args.epoch_start_i, args.num_epochs):
     ax2.set_xlabel("Epoch")
     ax2.set_ylabel("Current loss")
 
-    plt.savefig('loss_vs_epochs.png')
+    plt.savefig(os.path.join(results_path, 'loss_vs_epochs.png'))
 
     plt.clf()
 
@@ -356,7 +367,8 @@ for epoch in range(args.epoch_start_i, args.num_epochs):
     ax3.set_xlabel("Epoch")
     ax3.set_ylabel("Current IoU")
 
-    plt.savefig('iou_vs_epochs.png')
+    plt.savefig(os.path.join(results_path, 'iou_vs_epochs.png'))
+
 
 
 
