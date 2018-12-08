@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Options SBATCH :
-#SBATCH --job-name=densenet
+#SBATCH --job-name=training-full-val
 #SBATCH --output=/projets/thesepizenberg/deep-learning/logs/densenet-%j.out
 #SBATCH --error=/projets/thesepizenberg/deep-learning/logs/densenet-%j.out
 
@@ -48,10 +48,10 @@ wait
 
 
 srun keras-py3-tf /users/thesepizenberg/mlebouch/venv/bin/python "$TRAIN_SCRIPT_DIR/train.py" \
-                --num_epochs=150 \
-                --checkpoint_step=2 \
+                --num_epochs=200 \
+                --checkpoint_step=5 \
                 --validation_step=1 \
-                --num_val_images=200 \
+                --num_val_images=1449 \
                 --dataset=voc-ha \
                 --crop_height=${3} \
                 --crop_width=${3} \
