@@ -168,7 +168,7 @@ random.seed(16)
 val_indices=random.sample(range(0,len(val_input_names)),num_vals)
 results_path = "%s/%s/%s" % ("results", args.model, args.frontend)
 results_filename = "results-{}-{}-{}.txt".format(args.input_size,
-                                                 args.validation_step,
+                                                 args.num_val_images,
                                                  'augmented' if is_dataset_augmented else 'non-augmented')
 
 if not os.path.exists(results_path):
@@ -364,7 +364,7 @@ for epoch in range(args.epoch_start_i, args.num_epochs):
     ax2.set_xlabel("Epoch")
     ax2.set_ylabel("Current loss")
 
-    plt.savefig(os.path.join(results_path, 'loss_vs_epochs_{}.png'.format(args.validation_step)))
+    plt.savefig(os.path.join(results_path, 'loss_vs_epochs_{}.png'.format(args.num_val_images)))
 
     plt.clf()
 
