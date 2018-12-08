@@ -53,12 +53,12 @@ srun keras-py3-tf /users/thesepizenberg/mlebouch/venv/bin/python "$TRAIN_SCRIPT_
                 --validation_step=1 \
                 --num_val_images=200 \
                 --dataset=voc-ha \
-                --crop_height=512 \
-                --crop_width=512 \
-                --input_size=512 \
-                --h_flip=yes \
-                --brightness=0.1 \
-                --rotation=5 \
+                --crop_height=${3} \
+                --crop_width=${3} \
+                --input_size=${3} \
                 --model=${1} \
                 --frontend=${2}
+                #--h_flip=yes \
+                #--brightness=0.1 \
+                #--rotation=5 \
 wait
