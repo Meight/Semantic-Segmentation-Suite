@@ -108,9 +108,9 @@ unc = tf.where(tf.equal(tf.reduce_sum(net_output, axis=-1), 0),
                tf.ones(shape=weights_shape))
 
 loss = tf.reduce_mean(tf.losses.compute_weighted_loss(weights = tf.cast(unc, tf.float32),
-                                       losses = tf.nn.softmax_cross_entropy_with_logits_v2(
-                                           logits = network,
-                                           labels = net_output)))
+                                                      losses = tf.nn.softmax_cross_entropy_with_logits_v2(
+                                                          logits = network,
+                                                          labels = net_output)))
 
 opt = tf.train.RMSPropOptimizer(learning_rate=args.learning_rate, decay=0.995).minimize(loss, var_list=[var for var in tf.trainable_variables()])
 
@@ -167,7 +167,9 @@ num_vals = min(args.num_val_images, len(val_input_names))
 random.seed(16)
 val_indices=random.sample(range(0,len(val_input_names)),num_vals)
 results_path = "%s/%s/%s" % ("results", args.model, args.frontend)
-results_filename = "results-{}-{}.txt".format(args.input_size, 'augmented' if is_dataset_augmented else 'non-augmented')
+results_filename = "results-{}-{}-{}.txt".format(args.input_size,
+                                                 args.validation_step,
+                                                 'augmented' if is_dataset_augmented else 'non-augmented')
 
 if not os.path.exists(results_path):
     os.makedirs(results_path)
@@ -362,7 +364,7 @@ for epoch in range(args.epoch_start_i, args.num_epochs):
     ax2.set_xlabel("Epoch")
     ax2.set_ylabel("Current loss")
 
-    plt.savefig(os.path.join(results_path, 'loss_vs_epochs.png'))
+    plt.savefig(os.path.join(results_path, 'loss_vs_epochs_{}.png'.format(args.validation_step)))
 
     plt.clf()
 
