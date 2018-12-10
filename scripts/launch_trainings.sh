@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 
 SCRIPT_PATH="/projets/thesepizenberg/deep-learning/segmentation-suite/scripts"
-MODEL_NAMES=("DeepLabV3_plus" "BiSeNet" "GCN")
+MODEL_NAMES=("BiSeNet")
 FRONTEND_NAMES=("ResNet101")
-INPUT_SIZE=(512)
+INPUT_SIZE=(440)
 BATCH_SIZE=16
 
 for model_name in "${MODEL_NAMES[@]}"; do
