@@ -7,7 +7,7 @@
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=5
 #SBATCH --partition=GPUNodes
-#SBATCH --gres=gpu:1
+#SBATCH --gres=gpu:4
 #SBATCH --mem-per-cpu=9000M
 
 set -e
@@ -52,6 +52,7 @@ srun keras-py3-tf /users/thesepizenberg/mlebouch/venv/bin/python "$TRAIN_SCRIPT_
                 --checkpoint_step=5 \
                 --validation_step=1 \
                 --num_val_images=1449 \
+                --batch_size=${4} \
                 --dataset=voc-ha \
                 --crop_height=${3} \
                 --crop_width=${3} \
