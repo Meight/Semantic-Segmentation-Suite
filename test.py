@@ -87,6 +87,7 @@ for ind in range(len(test_input_names)):
     run_times_list.append(time.time()-st)
 
     output_image = np.array(output_image[0,:,:,:])
+
     out_vis_image = helpers.colour_code_segmentation(output_image, label_values)
 
     output_image = output_image[valid_indices, :]
