@@ -324,6 +324,7 @@ for epoch in range(args.epoch_start_i, args.num_epochs):
         avg_iou_per_epoch.append(avg_iou)
 
         measures = {
+            'epoch': epoch,
             'accuracy': avg_score,
             'class_accuracies': class_avg_scores,
             'precision': avg_precision,
@@ -335,8 +336,6 @@ for epoch in range(args.epoch_start_i, args.num_epochs):
         summary_formatter.update(current_epoch=epoch,
                                  measures_dictionary=measures)
 
-        print(header_format.format(*headers))
-        print(row_format.format(epoch, avg_score, avg_precision, avg_recall, avg_f1, avg_iou))
         print("\nAverage validation accuracy for epoch # %04d = %f"% (epoch, avg_score))
         print("Average per class validation accuracies for epoch # %04d:"% (epoch))
         for index, item in enumerate(class_avg_scores):
