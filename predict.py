@@ -55,7 +55,7 @@ saver.restore(sess, args.checkpoint_path)
 print("Testing image " + args.image)
 
 loaded_image = utils.load_image(args.image)
-resized_image = resize_to_size(loaded_image, desired_size=input_size)
+resized_image, _ = resize_to_size(loaded_image, desired_size=input_size)
 input_image = np.expand_dims(np.float32(resized_image),axis=0)/255.0
 
 st = time.time()
