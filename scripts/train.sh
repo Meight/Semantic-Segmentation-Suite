@@ -48,17 +48,17 @@ wait
 
 
 srun keras-py3-tf /users/thesepizenberg/mlebouch/venv/bin/python "$TRAIN_SCRIPT_DIR/train.py" \
-                --num_epochs=200 \
+                --num_epochs=25 \
                 --checkpoint_step=5 \
                 --validation_step=1 \
                 --num_val_images=1449 \
-                --batch_size=${4} \
-                --dataset=voc-ha \
+                --model=${1} \
+                --frontend=${2} \
                 --crop_height=${3} \
                 --crop_width=${3} \
                 --input_size=${3} \
-                --model=${1} \
-                --frontend=${2}
+                --batch_size=${4} \
+                --dataset=${5}
                 #--h_flip=yes \
                 #--brightness=0.1 \
                 #--rotation=5 \
