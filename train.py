@@ -212,6 +212,7 @@ for epoch in range(args.epoch_start_i, args.num_epochs):
 
     # Equivalent to shuffling
     id_list = np.random.permutation(len(train_input_names))
+    number_train_images = len(train_input_names)
 
     num_iters = len(train_output_names) // args.batch_size
     st = time.time()
@@ -224,7 +225,7 @@ for epoch in range(args.epoch_start_i, args.num_epochs):
 
         # Collect a batch of images
         for j in range(args.batch_size):
-            index = i*args.batch_size + j
+            index = (i * args.batch_size + j) % number_train_images
             id = id_list[index]
 
             input_image_name = train_input_names[id]
