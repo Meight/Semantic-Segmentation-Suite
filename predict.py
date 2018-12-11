@@ -2,6 +2,7 @@ import os,time,cv2, sys, math
 import tensorflow as tf
 import argparse
 import numpy as np
+import matplotlib.pyplot as plt
 
 from utils import utils, helpers
 from builders import model_builder
@@ -67,8 +68,12 @@ output_image = np.array(output_image[0,:,:,:])
 output_image = helpers.reverse_one_hot(output_image)
 
 out_vis_image = helpers.colour_code_segmentation(output_image, label_values)
+plt.figure()
+plt.imshow(input_image)
+plt.imshow(cv2.cvtColor(np.uint8(out_vis_image), cv2.COLOR_RGB2BGR), alpha=0.65)
 file_name = utils.filepath_to_name(args.image)
-cv2.imwrite("%s_pred.png"%(file_name),cv2.cvtColor(np.uint8(out_vis_image), cv2.COLOR_RGB2BGR))
+plt.savefig("%s_pred.png"%(file_name))
+
 
 print("")
 print("Finished!")
