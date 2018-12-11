@@ -68,7 +68,7 @@ output_image = helpers.reverse_one_hot(output_image)
 
 out_vis_image = helpers.colour_code_segmentation(output_image, label_values)
 file_name = utils.filepath_to_name(args.image)
-save_image(np.uint8(out_vis_image), "%s_pred.png"%(file_name))
+cv2.imwrite("%s_pred.png"%(file_name),cv2.cvtColor(np.uint8(out_vis_image), cv2.COLOR_RGB2BGR))
 
 print("")
 print("Finished!")
