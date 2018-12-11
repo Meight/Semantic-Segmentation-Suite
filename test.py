@@ -116,7 +116,7 @@ for ind in range(len(test_input_names)):
     plt.imshow(resized_image)
     plt.imshow(cv2.cvtColor(np.uint8(out_vis_image), cv2.COLOR_RGB2BGR), alpha=0.55)
     plt.title('Prediction')
-    file_name = utils.filepath_to_name(args.image)
+    file_name = utils.filepath_to_name(test_input_names[ind])
     plt.savefig("predictions/%s.png" % (file_name))
 
 
