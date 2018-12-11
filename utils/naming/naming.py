@@ -23,8 +23,7 @@ class FilesFormatterFactory:
                             self.mode,
                             self.dataset_name,
                             self.model_name,
-                            self.backbone_name,
-                            self._parameters_string)
+                            self.backbone_name)
 
     def generate_parameters_string(self):
         return '_'.join(['{}-{}'.format(self._get_initials(parameter_name), parameter_value)
@@ -34,10 +33,10 @@ class FilesFormatterFactory:
         return ''.join([x[0].upper() for x in string.split('_')])
 
     def generate_checkpoint_name(self, current_epoch):
-        return os.path.join(self._full_detailed_path, str(current_epoch) + '.ckpt')
+        return os.path.join(self._full_detailed_path, self._parameters_string + '.ckpt')
 
     def generate_summary_name(self, current_epoch):
-        return os.path.join(self._full_detailed_path, str(current_epoch) + '.csv')
+        return os.path.join(self._full_detailed_path, self._parameters_string + '.csv')
 
     def get_checkpoint_formatter(self, saver):
         return CheckpointFormatter(self.mode,
