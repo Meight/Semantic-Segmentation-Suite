@@ -94,8 +94,8 @@ sess=tf.Session(config=config)
 
 
 # Compute your softmax cross entropy loss
-input_tensor = tf.placeholder(tf.float32, shape=[None, input_size, input_size, 3])
-output_tensor = tf.placeholder(tf.float32, shape=[None, input_size, input_size, num_classes])
+input_tensor = tf.placeholder(tf.float32, shape=[None, None, None, 3])
+output_tensor = tf.placeholder(tf.float32, shape=[None, None, None, num_classes])
 
 predictions_tensor, init_fn = model_builder.build_model(model_name=args.model,
                                                         frontend=args.frontend,
@@ -218,9 +218,6 @@ for epoch in range(args.epoch_start_i, args.num_epochs):
 
             input_image_name = train_input_names[id]
             output_image_name = random.choice(images_association[input_image_name])
-
-            print('==================')
-            print(input_image_name, output_image_name)
 
             input_image = utils.load_image(input_image_name)
             output_image = utils.load_image(output_image_name)

@@ -37,9 +37,17 @@ class SummaryFormatter(FilesFormatter):
     def __init__(self):
         self.header_created = False
 
-    def __enter__(self, current_epoch, measures_dictionary):
+    def __enter__(self, current_epoch, measures_dictionary, column_margin=2):
+        column_width = len(max(measures_dictionary.keys(), key=len)) + column_margin
+
         with open(self.generate_summary_name(current_epoch=current_epoch), 'a') as summary_file:
             if not self.header_created:
-                print(header_format.format(*headers))
+                summary_file.write(self.generate_header(column_names=measures_dictionary.keys(),
+                                                        column_width=column_width))
 
-            summary_file.write()
+            summary_file.write(''.join(['{value:<{width}.3f}'.format(value=measure, width=column_width)
+                                       for measure in measures_dictionary.values()]))
+
+    def generate_header(self, column_names, column_width):
+        return ''.join(['{0:<{width}}'.format(column_name, width=column_width)
+                          for column_name in column_names]) + '\n'
