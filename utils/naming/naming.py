@@ -74,8 +74,8 @@ class SummaryFormatter(FilesFormatterFactory):
                 self.header_created = True
 
             summary_file.write(''.join(['{value:<{width}.{precision}f}'.format(value=measure,
-                                                                               width=column_width,
-                                                                               precision=precision)
+                                                                                width=column_width,
+                                                                                precision=precision)
                                         for measure in measures_dictionary.values()]))
 
         if self.verbose or verbose:
