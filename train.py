@@ -4,6 +4,7 @@ import argparse
 import os
 import random
 import time
+from collections import OrderedDict
 
 import cv2
 import matplotlib
@@ -323,15 +324,15 @@ for epoch in range(args.epoch_start_i, args.num_epochs):
         avg_iou = np.mean(iou_list)
         avg_iou_per_epoch.append(avg_iou)
 
-        measures = {
-            'epoch': epoch,
-            'accuracy': avg_score,
-            'class_accuracies': class_avg_scores,
-            'precision': avg_precision,
-            'recall': avg_recall,
-            'f1': avg_f1,
-            'miou': avg_iou
-        }
+        measures = OrderedDict([
+            ('epoch', epoch),
+            ('accuracy', avg_score),
+            ('class_accuracies', class_avg_scores),
+            ('precision', avg_precision),
+            ('recall', avg_recall),
+            ('f1', avg_f1),
+            ('miou', avg_iou)
+        ])
 
         summary_formatter.update(current_epoch=epoch,
                                  measures_dictionary=measures)
@@ -345,48 +346,48 @@ for epoch in range(args.epoch_start_i, args.num_epochs):
         print("Validation F1 score = ", avg_f1)
         print("Validation IoU score = ", avg_iou)
 
-    epoch_time=time.time()-epoch_st
-    remain_time=epoch_time*(args.num_epochs-1-epoch)
-    m, s = divmod(remain_time, 60)
-    h, m = divmod(m, 60)
-    if s!=0:
-        train_time="Remaining training time = %d hours %d minutes %d seconds\n"%(h,m,s)
-    else:
-        train_time="Remaining training time : Training completed.\n"
-    utils.LOG(train_time)
-    scores_list = []
+        epoch_time=time.time()-epoch_st
+        remain_time=epoch_time*(args.num_epochs-1-epoch)
+        m, s = divmod(remain_time, 60)
+        h, m = divmod(m, 60)
+        if s!=0:
+            train_time="Remaining training time = %d hours %d minutes %d seconds\n"%(h,m,s)
+        else:
+            train_time="Remaining training time : Training completed.\n"
+        utils.LOG(train_time)
+        scores_list = []
 
-    fig1, ax1 = plt.subplots(figsize=(11, 8))
+        fig1, ax1 = plt.subplots(figsize=(11, 8))
 
-    ax1.plot(range(epoch+1), avg_scores_per_epoch)
-    ax1.set_title("Average validation accuracy vs epochs")
-    ax1.set_xlabel("Epoch")
-    ax1.set_ylabel("Avg. val. accuracy")
+        ax1.plot(range(epoch+1), avg_scores_per_epoch)
+        ax1.set_title("Average validation accuracy vs epochs")
+        ax1.set_xlabel("Epoch")
+        ax1.set_ylabel("Avg. val. accuracy")
 
 
-    plt.savefig(os.path.join(results_path, 'accuracy_vs_epochs.png'))
+        plt.savefig(os.path.join(results_path, 'accuracy_vs_epochs.png'))
 
-    plt.clf()
+        plt.clf()
 
-    fig2, ax2 = plt.subplots(figsize=(11, 8))
+        fig2, ax2 = plt.subplots(figsize=(11, 8))
 
-    ax2.plot(range(epoch+1), avg_loss_per_epoch)
-    ax2.set_title("Average loss vs epochs")
-    ax2.set_xlabel("Epoch")
-    ax2.set_ylabel("Current loss")
+        ax2.plot(range(epoch+1), avg_loss_per_epoch)
+        ax2.set_title("Average loss vs epochs")
+        ax2.set_xlabel("Epoch")
+        ax2.set_ylabel("Current loss")
 
-    plt.savefig(os.path.join(results_path, 'loss_vs_epochs_{}.png'.format(args.num_val_images)))
+        plt.savefig(os.path.join(results_path, 'loss_vs_epochs_{}.png'.format(args.num_val_images)))
 
-    plt.clf()
+        plt.clf()
 
-    fig3, ax3 = plt.subplots(figsize=(11, 8))
+        fig3, ax3 = plt.subplots(figsize=(11, 8))
 
-    ax3.plot(range(epoch+1), avg_iou_per_epoch)
-    ax3.set_title("Average IoU vs epochs")
-    ax3.set_xlabel("Epoch")
-    ax3.set_ylabel("Current IoU")
+        ax3.plot(range(epoch+1), avg_iou_per_epoch)
+        ax3.set_title("Average IoU vs epochs")
+        ax3.set_xlabel("Epoch")
+        ax3.set_ylabel("Current IoU")
 
-    plt.savefig(os.path.join(results_path, 'iou_vs_epochs.png'))
+        plt.savefig(os.path.join(results_path, 'iou_vs_epochs.png'))
 
 
 
