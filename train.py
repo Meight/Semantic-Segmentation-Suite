@@ -71,8 +71,6 @@ files_formatter_factory = FilesFormatterFactory(mode='training',
                                                 training_parameters=training_parameters,
                                                 verbose=True,
                                                 results_folder='/projets/thesepizenberg/deep-learning/segmentation-suite')
-checkpoint_formatter = files_formatter_factory.get_checkpoint_formatter(saver=tf.train.Saver(max_to_keep=1000))
-summary_formatter = files_formatter_factory.get_summary_formatter()
 
 
 def data_augmentation(input_image, output_image):
@@ -153,6 +151,9 @@ if init_fn is not None:
 
 # Load a previous checkpoint if desired
 model_checkpoint_name = "checkpoints/latest_model_" + args.model + "_" + args.dataset + ".ckpt"
+checkpoint_formatter = files_formatter_factory.get_checkpoint_formatter(saver=tf.train.Saver(max_to_keep=1000))
+summary_formatter = files_formatter_factory.get_summary_formatter()
+
 if args.continue_training:
     print('Loaded latest model checkpoint.')
     checkpoint_formatter.restore(session, model_checkpoint_name)
@@ -197,19 +198,6 @@ results_path = "%s/%s/%s" % ("results", args.model, args.frontend)
 results_filename = "results-{}-{}-{}.txt".format(args.input_size,
                                                  args.num_val_images,
                                                  'augmented' if is_dataset_augmented else 'non-augmented')
-
-if not os.path.exists(results_path):
-    os.makedirs(results_path)
-
-headers = ['epoch', 'avg_accuracy', 'precision', 'recall', 'f1', 'miou']
-
-column_margin = 2
-column_width = len(max(headers, key=len)) + column_margin
-header_format = '{:<13}' * len(headers)
-row_format = '{:<13.3f}' * len(headers)
-with open(os.path.join(results_path, results_filename),
-          "a+") as results_file:
-    results_file.write(header_format.format(*headers))
 
 images_association = build_images_association_dictionary(train_input_names, train_output_names)
 
