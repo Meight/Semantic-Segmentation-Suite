@@ -10,6 +10,9 @@ import os, sys
 import subprocess
 
 import matplotlib
+
+from utils.utils import build_images_association_dictionary
+
 matplotlib.use('Agg')
 
 from utils import utils, helpers
@@ -47,9 +50,8 @@ parser.add_argument('--model', type=str, default="FC-DenseNet56", help='The mode
 parser.add_argument('--frontend', type=str, default="ResNet101", help='The frontend you are using. See frontend_builder.py for supported models')
 args = parser.parse_args()
 
-
+input_size = int(args.input_size)
 is_dataset_augmented = args.h_flip or args.v_flip or (args.brightness is not None) or (args.rotation is not None)
-
 
 def data_augmentation(input_image, output_image):
     # Data augmentation
@@ -92,22 +94,31 @@ sess=tf.Session(config=config)
 
 
 # Compute your softmax cross entropy loss
-net_input = tf.placeholder(tf.float32, shape=[None, None, None, 3])
-net_output = tf.placeholder(tf.float32, shape=[None, None, None, num_classes])
+input_tensor = tf.placeholder(tf.float32, shape=[None, None, None, 3])
+output_tensor = tf.placeholder(tf.float32, shape=[None, None, None, num_classes])
 
-network, init_fn = model_builder.build_model(model_name=args.model, frontend=args.frontend, net_input=net_input, num_classes=num_classes, crop_width=args.crop_width, crop_height=args.crop_height, is_training=True)
+predictions_tensor, init_fn = model_builder.build_model(model_name=args.model,
+                                                        frontend=args.frontend,
+                                                        net_input=input_tensor,
+                                                        num_classes=num_classes,
+                                                        crop_width=args.crop_width,
+                                                        crop_height=args.crop_height,
+                                                        is_training=True)
 
 weights_shape = (args.batch_size, args.input_size, args.input_size)
-unc = tf.where(tf.equal(tf.reduce_sum(net_output, axis=-1), 0),
+unc = tf.where(tf.equal(tf.reduce_sum(output_tensor, axis=-1), 0),
                tf.zeros(shape=weights_shape),
                tf.ones(shape=weights_shape))
 
 loss = tf.reduce_mean(tf.losses.compute_weighted_loss(weights = tf.cast(unc, tf.float32),
                                                       losses = tf.nn.softmax_cross_entropy_with_logits_v2(
-                                                          logits = network,
-                                                          labels = net_output)))
+                                                          logits = predictions_tensor,
+                                                          labels = output_tensor)))
 
-opt = tf.train.RMSPropOptimizer(learning_rate=args.learning_rate, decay=0.995, momentum=0.9).minimize(loss, var_list=[var for var in tf.trainable_variables()])
+opt = tf.train.RMSPropOptimizer(learning_rate=args.learning_rate,
+                                decay=0.995,
+                                momentum=0.9).minimize(loss,
+                                                       var_list=[var for var in tf.trainable_variables()])
 
 saver=tf.train.Saver(max_to_keep=1000)
 sess.run(tf.global_variables_initializer())
@@ -179,6 +190,8 @@ with open(os.path.join(results_path, results_filename),
           "a+") as results_file:
     results_file.write(header_format.format(*headers))
 
+images_association = build_images_association_dictionary(train_input_names, train_output_names)
+
 # Do the training here
 for epoch in range(args.epoch_start_i, args.num_epochs):
 
@@ -202,8 +215,12 @@ for epoch in range(args.epoch_start_i, args.num_epochs):
         for j in range(args.batch_size):
             index = i*args.batch_size + j
             id = id_list[index]
-            input_image = utils.load_image(train_input_names[id])
-            output_image = utils.load_image(train_output_names[id])
+
+            input_image_name = train_input_names[id]
+            output_image_name = random.choice(images_association[input_image_name])
+
+            input_image = utils.load_image(input_image_name)
+            output_image = utils.load_image(output_image_name)
 
             with tf.device('/cpu:0'):
                 input_image, output_image = data_augmentation(input_image, output_image)
@@ -224,7 +241,7 @@ for epoch in range(args.epoch_start_i, args.num_epochs):
             output_image_batch = np.squeeze(np.stack(output_image_batch, axis=1))
 
         # Do the training
-        _,current=sess.run([opt,loss],feed_dict={net_input:input_image_batch,net_output:output_image_batch})
+        _,current=sess.run([opt,loss], feed_dict={input_tensor:input_image_batch, output_tensor:output_image_batch})
         current_losses.append(current)
         cnt = cnt + args.batch_size
         if cnt % 20 == 0:
@@ -280,7 +297,7 @@ for epoch in range(args.epoch_start_i, args.num_epochs):
 
             # st = time.time()
 
-            output_image = sess.run(network,feed_dict={net_input:input_image})
+            output_image = sess.run(predictions_tensor, feed_dict={input_tensor:input_image})
 
 
             output_image = np.array(output_image[0,:,:,:])
