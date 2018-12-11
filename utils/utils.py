@@ -342,6 +342,8 @@ def save_image(npdata, out_filename):
 def build_images_association_dictionary(input_image_names, output_image_names):
     association_dictionary = {}
 
+    print(input_image_names, output_image_names)
+
     for input_image_name in input_image_names:
         association_dictionary[input_image_name] = [image_name
                                                     for image_name in output_image_names
