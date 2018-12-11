@@ -345,6 +345,7 @@ def build_images_association_dictionary(input_image_names, output_image_names):
     for input_image_name in input_image_names:
         association_dictionary[input_image_name] = [image_name
                                                     for image_name in output_image_names
-                                                    if os.path.splitext(input_image_name)[0] in image_name]
+                                                    if os.path.splitext(os.path.basename(input_image_name))[0]
+                                                    in image_name]
 
     return association_dictionary
