@@ -327,7 +327,6 @@ for epoch in range(args.epoch_start_i, args.num_epochs):
         measures = OrderedDict([
             ('epoch', epoch),
             ('accuracy', avg_score),
-            ('class_accuracies', class_avg_scores),
             ('precision', avg_precision),
             ('recall', avg_recall),
             ('f1', avg_f1),

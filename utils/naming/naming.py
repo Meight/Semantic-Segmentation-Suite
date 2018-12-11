@@ -74,8 +74,7 @@ class SummaryFormatter(FilesFormatterFactory):
                 self.header_created = True
 
             for measure in measures_dictionary.values():
-                print(measure)
-                summary_file.write('{value:<{width}.{precision}f}'.format(value=float(measure),
+                summary_file.write('{value:<{width}.{precision}f}'.format(value=measure,
                                                                           width=column_width,
                                                                           precision=precision))
 
