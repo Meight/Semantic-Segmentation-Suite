@@ -75,7 +75,9 @@ class SummaryFormatter(FilesFormatterFactory):
             for measure in measures_dictionary.values():
                 summary_file.write('{value:<{width}.{precision}f}'.format(value=measure,
                                                                           width=column_width,
-                                                                          precision=precision) + '\n')
+                                                                          precision=precision))
+
+            summary_file.write('\n')
 
         if self.verbose or verbose:
             print('Updated session summary at {}.'.format(self.generate_summary_name(self.current_epoch)))
