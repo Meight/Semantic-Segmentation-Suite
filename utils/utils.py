@@ -189,7 +189,7 @@ def resize_to_size(image, label = None, desired_size = 256):
     image = cv2.copyMakeBorder(image, top, bottom, left, right, cv2.BORDER_CONSTANT,
                                value=color)
 
-    if label is None:
+    if label is not None:
         label = cv2.copyMakeBorder(label, top, bottom, left, right, cv2.BORDER_CONSTANT,
                                    value=color)
 
