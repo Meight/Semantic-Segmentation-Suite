@@ -2,9 +2,11 @@ import os,time,cv2, sys, math
 import tensorflow as tf
 import argparse
 import numpy as np
+import matplotlib.pyplot as plt
 
 from utils import utils, helpers
 from builders import model_builder
+from utils.utils import resize_to_size
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--checkpoint_path', type=str, default=None, required=True, help='The path to the latest checkpoint weights for your model.')
@@ -12,7 +14,10 @@ parser.add_argument('--crop_height', type=int, default=512, help='Height of crop
 parser.add_argument('--crop_width', type=int, default=512, help='Width of cropped input image to network')
 parser.add_argument('--model', type=str, default=None, required=True, help='The model you are using')
 parser.add_argument('--dataset', type=str, default="CamVid", required=False, help='The dataset you are using')
+parser.add_argument('--input-size', dest="input_size", type=int, default=512, required=False, help='The dataset you are using')
 args = parser.parse_args()
+
+input_size = int(args.input_size)
 
 # Get the names of the classes so we can record the evaluation results
 print("Retrieving dataset information ...")
@@ -44,7 +49,7 @@ saver.restore(sess, args.checkpoint_path)
 
 # Load the data
 print("Loading the data ...")
-train_input_names,train_output_names, val_input_names, val_output_names, test_input_names, test_output_names = utils.prepare_data(dataset_dir=args.dataset)
+_,  _, test_input_names, test_output_names, _, _ = utils.prepare_data(dataset_dir=args.dataset)
 
 # Create directories if needed
 if not os.path.isdir("%s"%("Test")):
@@ -65,9 +70,12 @@ for ind in range(len(test_input_names)):
     sys.stdout.write("\rRunning test image %d / %d"%(ind+1, len(test_input_names)))
     sys.stdout.flush()
 
-    input_image = np.expand_dims(np.float32(utils.load_image(test_input_names[ind])[:args.crop_height, :args.crop_width]),axis=0)/255.0
-    gt = utils.load_image(test_output_names[ind])[:args.crop_height, :args.crop_width]
-    gt = helpers.reverse_one_hot(helpers.one_hot_it(gt, label_values))
+    input_image = utils.load_image(test_input_names[ind])
+    gt = utils.load_image(test_output_names[ind])
+
+    resized_image, resized_labels = resize_to_size(input_image, label=gt, desired_size=input_size)
+    input_image = np.expand_dims(np.float32(resized_image), axis=0)/255.0
+    gt = helpers.reverse_one_hot(helpers.one_hot_it(resized_labels, label_values))
 
     st = time.time()
     output_image = sess.run(network,feed_dict={net_input:input_image})
@@ -95,8 +103,11 @@ for ind in range(len(test_input_names)):
     
     gt = helpers.colour_code_segmentation(gt, label_values)
 
-    cv2.imwrite("%s/%s_pred.png"%("Test", file_name),cv2.cvtColor(np.uint8(out_vis_image), cv2.COLOR_RGB2BGR))
-    cv2.imwrite("%s/%s_gt.png"%("Test", file_name),cv2.cvtColor(np.uint8(gt), cv2.COLOR_RGB2BGR))
+    plt.figure()
+    plt.imshow(resized_image)
+    plt.imshow(cv2.cvtColor(np.uint8(out_vis_image), cv2.COLOR_RGB2BGR), alpha=0.55)
+    file_name = utils.filepath_to_name(args.image)
+    plt.savefig("predictions/%s.png" % (file_name))
 
 
 target.close()
