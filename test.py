@@ -108,8 +108,14 @@ for ind in range(len(test_input_names)):
     gt = helpers.colour_code_segmentation(gt, label_values)
 
     plt.figure()
+    plt.subplot(1, 2, 1)
     plt.imshow(resized_image)
-    plt.imshow(cv2.cvtColor(np.uint8(out_vis_image), cv2.COLOR_RGB2BGR), alpha=0.55)
+    plt.imshow(gt, alpha=0.55)
+    plt.title('Ground truth')
+    plt.subplot(1, 2, 2)
+    plt.imshow(resized_image)
+    plt.imshow(np.uint8(out_vis_image), alpha=0.55)
+    plt.title('Prediction')
     file_name = utils.filepath_to_name(args.image)
     plt.savefig("predictions/%s.png" % (file_name))
 
