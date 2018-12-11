@@ -5,7 +5,7 @@ import numpy as np
 
 from utils import utils, helpers
 from builders import model_builder
-from utils.utils import resize_to_size
+from utils.utils import resize_to_size, save_image
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--image', type=str, default=None, required=True, help='The image you want to predict on. ')
@@ -68,7 +68,7 @@ output_image = helpers.reverse_one_hot(output_image)
 
 out_vis_image = helpers.colour_code_segmentation(output_image, label_values)
 file_name = utils.filepath_to_name(args.image)
-cv2.imwrite("%s_pred.png"%(file_name),cv2.cvtColor(np.uint8(out_vis_image), cv2.COLOR_RGB2BGR))
+save_image(np.uint8(out_vis_image), "%s_pred.png"%(file_name))
 
 print("")
 print("Finished!")
