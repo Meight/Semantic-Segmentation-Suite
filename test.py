@@ -87,9 +87,10 @@ for ind in range(len(test_input_names)):
     run_times_list.append(time.time()-st)
 
     output_image = np.array(output_image[0,:,:,:])
+    out_vis_image = helpers.colour_code_segmentation(output_image, label_values)
+
     output_image = output_image[valid_indices, :]
     output_image = helpers.reverse_one_hot(output_image)
-    out_vis_image = helpers.colour_code_segmentation(output_image, label_values)
 
     accuracy, class_accuracies, prec, rec, f1, iou = utils.evaluate_segmentation(pred=output_image, label=gt, num_classes=num_classes)
 
@@ -113,7 +114,7 @@ for ind in range(len(test_input_names)):
     plt.title('Ground truth')
     plt.subplot(1, 2, 2)
     plt.imshow(resized_image)
-    plt.imshow(np.uint8(out_vis_image), alpha=0.55)
+    plt.imshow(cv2.cvtColor(np.uint8(out_vis_image), cv2.COLOR_RGB2BGR), alpha=0.55)
     plt.title('Prediction')
     file_name = utils.filepath_to_name(args.image)
     plt.savefig("predictions/%s.png" % (file_name))
