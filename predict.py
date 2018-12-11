@@ -5,6 +5,7 @@ import numpy as np
 
 from utils import utils, helpers
 from builders import model_builder
+from utils.utils import resize_to_size
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--image', type=str, default=None, required=True, help='The image you want to predict on. ')
@@ -13,7 +14,10 @@ parser.add_argument('--crop_height', type=int, default=512, help='Height of crop
 parser.add_argument('--crop_width', type=int, default=512, help='Width of cropped input image to network')
 parser.add_argument('--model', type=str, default=None, required=True, help='The model you are using')
 parser.add_argument('--dataset', type=str, default="CamVid", required=False, help='The dataset you are using')
+parser.add_argument('--input-size', dest='input_size', type=str, default=512, required=False, help='Size of the input images.')
 args = parser.parse_args()
+
+input_size = int(args.input_size)
 
 class_names_list, label_values = helpers.get_label_info(os.path.join(args.dataset, "class_dict.csv"))
 
@@ -51,8 +55,8 @@ saver.restore(sess, args.checkpoint_path)
 print("Testing image " + args.image)
 
 loaded_image = utils.load_image(args.image)
-resized_image =cv2.resize(loaded_image, (args.crop_width, args.crop_height))
-input_image = np.expand_dims(np.float32(resized_image[:args.crop_height, :args.crop_width]),axis=0)/255.0
+resized_image = resize_to_size(loaded_image, desired_size=input_size)
+input_image = np.expand_dims(np.float32(resized_image),axis=0)/255.0
 
 st = time.time()
 output_image = sess.run(network,feed_dict={net_input:input_image})

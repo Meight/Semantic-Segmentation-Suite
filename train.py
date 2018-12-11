@@ -9,12 +9,7 @@ import random
 import os, sys
 import subprocess
 
-# use 'Agg' on matplotlib so that plots could be generated even without Xserver
-# running
 import matplotlib
-
-from utils.training import get_valid_logits_and_labels
-
 matplotlib.use('Agg')
 
 from utils import utils, helpers
