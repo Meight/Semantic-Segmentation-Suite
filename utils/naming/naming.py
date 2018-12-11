@@ -28,3 +28,18 @@ class FilesFormatter:
 
     def generate_checkpoint_name(self, current_epoch):
         return sys.path.join(self._full_detailed_path, self._parameters_string, current_epoch + '.ckpt')
+
+    def generate_summary_name(self, current_epoch):
+        return sys.path.join(self._full_detailed_path, self._parameters_string, current_epoch + '.csv')
+
+
+class SummaryFormatter(FilesFormatter):
+    def __init__(self):
+        self.header_created = False
+
+    def __enter__(self, current_epoch, measures_dictionary):
+        with open(self.generate_summary_name(current_epoch=current_epoch), 'a') as summary_file:
+            if not self.header_created:
+                print(header_format.format(*headers))
+
+            summary_file.write()

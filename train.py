@@ -94,8 +94,8 @@ sess=tf.Session(config=config)
 
 
 # Compute your softmax cross entropy loss
-input_tensor = tf.placeholder(tf.float32, shape=[None, None, None, 3])
-output_tensor = tf.placeholder(tf.float32, shape=[None, None, None, num_classes])
+input_tensor = tf.placeholder(tf.float32, shape=[None, input_size, input_size, 3])
+output_tensor = tf.placeholder(tf.float32, shape=[None, input_size, input_size, num_classes])
 
 predictions_tensor, init_fn = model_builder.build_model(model_name=args.model,
                                                         frontend=args.frontend,
@@ -110,10 +110,10 @@ unc = tf.where(tf.equal(tf.reduce_sum(output_tensor, axis=-1), 0),
                tf.zeros(shape=weights_shape),
                tf.ones(shape=weights_shape))
 
-loss = tf.reduce_mean(tf.losses.compute_weighted_loss(weights = tf.cast(unc, tf.float32),
-                                                      losses = tf.nn.softmax_cross_entropy_with_logits_v2(
-                                                          logits = predictions_tensor,
-                                                          labels = output_tensor)))
+loss = tf.reduce_mean(tf.losses.compute_weighted_loss(weights=tf.cast(unc, tf.float32),
+                                                      losses=tf.nn.softmax_cross_entropy_with_logits_v2(
+                                                          logits=predictions_tensor,
+                                                          labels=output_tensor)))
 
 opt = tf.train.RMSPropOptimizer(learning_rate=args.learning_rate,
                                 decay=0.995,
@@ -191,7 +191,7 @@ with open(os.path.join(results_path, results_filename),
     results_file.write(header_format.format(*headers))
 
 images_association = build_images_association_dictionary(train_input_names, train_output_names)
-print(images_association)
+
 # Do the training here
 for epoch in range(args.epoch_start_i, args.num_epochs):
 
