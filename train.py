@@ -59,6 +59,7 @@ model_name = str(args.model)
 backbone_name = str(args.frontend)
 
 training_parameters = {
+    'epochs': int(args.num_epochs),
     'learning_rate': float(args.learning_rate),
     'batch_size': int(args.batch_size),
     'validation_steps': int(args.num_val_images),
@@ -212,7 +213,7 @@ for epoch in range(args.epoch_start_i, args.num_epochs):
     # Equivalent to shuffling
     id_list = np.random.permutation(len(train_input_names))
 
-    num_iters = int(np.floor(len(id_list) / args.batch_size))
+    num_iters = len(train_output_names) // args.batch_size
     st = time.time()
     epoch_st = time.time()
     for i in range(num_iters):
@@ -262,8 +263,6 @@ for epoch in range(args.epoch_start_i, args.num_epochs):
     mean_loss = np.mean(current_losses)
     avg_loss_per_epoch.append(mean_loss)
 
-    checkpoint_formatter.save(session=session,
-                              current_epoch=epoch)
 
     if val_indices != 0 and epoch % args.checkpoint_step == 0:
         print("Saving checkpoint for this epoch")

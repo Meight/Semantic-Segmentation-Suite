@@ -4,7 +4,7 @@ SCRIPT_PATH="/projets/thesepizenberg/deep-learning/segmentation-suite/scripts"
 MODEL_NAMES=("BiSeNet")
 FRONTEND_NAMES=("ResNet101")
 INPUT_SIZE=(256 384 512)
-BATCH_SIZE=(1 2 4)
+BATCH_SIZE=(1)
 DATASET="voc-chh"
 
 for model_name in "${MODEL_NAMES[@]}"; do

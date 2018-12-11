@@ -48,8 +48,8 @@ wait
 
 
 srun keras-py3-tf /users/thesepizenberg/mlebouch/venv/bin/python "$TRAIN_SCRIPT_DIR/train.py" \
-                --num_epochs=25 \
-                --checkpoint_step=5 \
+                --num_epochs=60 \
+                --checkpoint_step=10 \
                 --validation_step=1 \
                 --num_val_images=1449 \
                 --model=${1} \
