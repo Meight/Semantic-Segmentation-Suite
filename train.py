@@ -191,6 +191,7 @@ with open(os.path.join(results_path, results_filename),
     results_file.write(header_format.format(*headers))
 
 images_association = build_images_association_dictionary(train_input_names, train_output_names)
+print(images_association)
 # Do the training here
 for epoch in range(args.epoch_start_i, args.num_epochs):
 

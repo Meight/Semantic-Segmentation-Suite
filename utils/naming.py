@@ -22,4 +22,6 @@ class FilesFormatter:
         return ''.join([x[0].upper() for x in string.split('_')])
 
     def generate_checkpoint_name(self):
+        parameters_string = '_'.join(['{}-{}'.format(self._get_initials(parameter_name), parameter_value)
+                                      for parameter_name, parameter_value in self.training_parameters.items()])
         return sys.path.join(self._full_detailed_path, )
