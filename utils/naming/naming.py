@@ -34,10 +34,10 @@ class FilesFormatterFactory:
         return ''.join([x[0].upper() for x in string.split('_')])
 
     def generate_checkpoint_name(self, current_epoch):
-        return os.path.join(self._full_detailed_path, current_epoch + '.ckpt')
+        return os.path.join(self._full_detailed_path, str(current_epoch) + '.ckpt')
 
     def generate_summary_name(self, current_epoch):
-        return os.path.join(self._full_detailed_path, current_epoch + '.csv')
+        return os.path.join(self._full_detailed_path, str(current_epoch) + '.csv')
 
     def get_checkpoint_formatter(self, saver):
         return CheckpointFormatter(self.mode,
