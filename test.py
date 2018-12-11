@@ -74,6 +74,7 @@ for ind in range(len(test_input_names)):
     gt = utils.load_image(test_output_names[ind])
 
     resized_image, gt = resize_to_size(input_image, label=gt, desired_size=input_size)
+    resized_gt = gt
     input_image = np.expand_dims(np.float32(resized_image), axis=0)/255.0
     gt = helpers.reverse_one_hot(helpers.one_hot_it(gt, label_values))
 
@@ -104,13 +105,11 @@ for ind in range(len(test_input_names)):
     recall_list.append(rec)
     f1_list.append(f1)
     iou_list.append(iou)
-    
-    gt = helpers.colour_code_segmentation(gt, label_values)
 
     plt.figure()
     plt.subplot(1, 2, 1)
     plt.imshow(resized_image)
-    plt.imshow(gt, alpha=0.55)
+    plt.imshow(resized_gt, alpha=0.55)
     plt.title('Ground truth')
     plt.subplot(1, 2, 2)
     plt.imshow(resized_image)
