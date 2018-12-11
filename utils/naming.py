@@ -1,0 +1,25 @@
+import sys
+
+class FilesFormatter:
+    def __init__(self, mode, dataset_name, model_name, backbone_name, training_parameters, results_folder='results'):
+        self.mode = mode
+        self.training_parameters = training_parameters
+        self.backbone_name = backbone_name
+        self.model_name = model_name
+        self.dataset_name = dataset_name
+
+        self.results_folder = results_folder
+        self._full_detailed_path = self.generate_full_detailed_path()
+
+    def generate_full_detailed_path(self):
+        return sys.path.join(self.results_folder,
+                             self.mode,
+                             self.dataset_name,
+                             self.model_name,
+                             self.backbone_name)
+
+    def _get_initials(self, string):
+        return ''.join([x[0].upper() for x in string.split('_')])
+
+    def generate_checkpoint_name(self):
+        return sys.path.join(self._full_detailed_path, )
