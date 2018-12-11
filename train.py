@@ -1,16 +1,16 @@
 from __future__ import print_function
-import os,time,cv2, sys, math
-import tensorflow as tf
-import tensorflow.contrib.slim as slim
-import numpy as np
-import time, datetime
+
 import argparse
+import os
 import random
-import os, sys
-import subprocess
+import time
 
+import cv2
 import matplotlib
+import numpy as np
+import tensorflow as tf
 
+from utils.naming.naming import FilesFormatterFactory
 from utils.utils import build_images_association_dictionary
 
 matplotlib.use('Agg')
@@ -53,6 +53,27 @@ args = parser.parse_args()
 input_size = int(args.input_size)
 is_dataset_augmented = args.h_flip or args.v_flip or (args.brightness is not None) or (args.rotation is not None)
 
+dataset_name = str(args.dataset)
+model_name = str(args.model)
+backbone_name = str(args.frontend)
+
+training_parameters = {
+    'learning_rate': float(args.learning_rate),
+    'batch_size': int(args.batch_size),
+    'validation_steps': int(args.num_val_images),
+    'input_size': input_size,
+    'augmented': is_dataset_augmented
+}
+files_formatter_factory = FilesFormatterFactory(mode='training',
+                                                dataset_name=dataset_name,
+                                                model_name=model_name,
+                                                backbone_name=backbone_name,
+                                                training_parameters=training_parameters,
+                                                verbose=True)
+checkpoint_formatter = files_formatter_factory.get_checkpoint_formatter(saver=tf.train.Saver(max_to_keep=1000))
+summary_formatter = files_formatter_factory.get_summary_formatter()
+
+
 def data_augmentation(input_image, output_image):
     # Data augmentation
     input_image, output_image = utils.resize_to_size(input_image, output_image, args.input_size)
@@ -90,7 +111,7 @@ num_classes = len(label_values)
 
 config = tf.ConfigProto()
 config.gpu_options.allow_growth = True
-sess=tf.Session(config=config)
+session=tf.Session(config=config)
 
 
 # Compute your softmax cross entropy loss
@@ -120,21 +141,20 @@ opt = tf.train.RMSPropOptimizer(learning_rate=args.learning_rate,
                                 momentum=0.9).minimize(loss,
                                                        var_list=[var for var in tf.trainable_variables()])
 
-saver=tf.train.Saver(max_to_keep=1000)
-sess.run(tf.global_variables_initializer())
+session.run(tf.global_variables_initializer())
 
 utils.count_params()
 
 # If a pre-trained ResNet is required, load the weights.
 # This must be done AFTER the variables are initialized with sess.run(tf.global_variables_initializer())
 if init_fn is not None:
-    init_fn(sess)
+    init_fn(session)
 
 # Load a previous checkpoint if desired
 model_checkpoint_name = "checkpoints/latest_model_" + args.model + "_" + args.dataset + ".ckpt"
 if args.continue_training:
-    print('Loaded latest model checkpoint')
-    saver.restore(sess, model_checkpoint_name)
+    print('Loaded latest model checkpoint.')
+    checkpoint_formatter.restore(session, model_checkpoint_name)
 
 # Load the data
 print("Loading the data ...")
@@ -171,7 +191,7 @@ num_vals = min(args.num_val_images, len(val_input_names))
 # Set random seed to make sure models are validated on the same validation images.
 # So you can compare the results of different models more intuitively.
 random.seed(16)
-val_indices=random.sample(range(0,len(val_input_names)),num_vals)
+val_indices = random.sample(range(0,len(val_input_names)),num_vals)
 results_path = "%s/%s/%s" % ("results", args.model, args.frontend)
 results_filename = "results-{}-{}-{}.txt".format(args.input_size,
                                                  args.num_val_images,
@@ -204,7 +224,7 @@ for epoch in range(args.epoch_start_i, args.num_epochs):
 
     num_iters = int(np.floor(len(id_list) / args.batch_size))
     st = time.time()
-    epoch_st=time.time()
+    epoch_st = time.time()
     for i in range(num_iters):
         # st=time.time()
 
@@ -225,7 +245,6 @@ for epoch in range(args.epoch_start_i, args.num_epochs):
             with tf.device('/cpu:0'):
                 input_image, output_image = data_augmentation(input_image, output_image)
 
-
                 # Prep the data. Make sure the labels are in one-hot format
                 input_image = np.float32(input_image) / 255.0
                 output_image = np.float32(helpers.one_hot_it(label=output_image, label_values=label_values))
@@ -241,7 +260,7 @@ for epoch in range(args.epoch_start_i, args.num_epochs):
             output_image_batch = np.squeeze(np.stack(output_image_batch, axis=1))
 
         # Do the training
-        _,current=sess.run([opt,loss], feed_dict={input_tensor:input_image_batch, output_tensor:output_image_batch})
+        _,current=session.run([opt, loss], feed_dict={input_tensor:input_image_batch, output_tensor:output_image_batch})
         current_losses.append(current)
         cnt = cnt + args.batch_size
         if cnt % 20 == 0:
@@ -253,28 +272,17 @@ for epoch in range(args.epoch_start_i, args.num_epochs):
     mean_loss = np.mean(current_losses)
     avg_loss_per_epoch.append(mean_loss)
 
-    epoch_checkpoints_path = "%s/%s/%s/%s/%04d" % ("checkpoints",
-                                                   args.model,
-                                                   args.frontend,
-                                                   'augmented' if is_dataset_augmented else 'non-augmented',
-                                                   epoch)
-    # Create directories if needed
-    if not os.path.isdir(epoch_checkpoints_path):
-        os.makedirs(epoch_checkpoints_path)
-
-    # Save latest checkpoint to same file name
-    print("Saving latest checkpoint")
-    saver.save(sess, model_checkpoint_name)
+    checkpoint_formatter.save(session=session,
+                              current_epoch=epoch)
 
     if val_indices != 0 and epoch % args.checkpoint_step == 0:
         print("Saving checkpoint for this epoch")
-        saver.save(sess, os.path.join(epoch_checkpoints_path, "model.ckpt"))
+        checkpoint_formatter.save(session=session,
+                                  current_epoch=epoch)
 
 
     if epoch % args.validation_step == 0:
         print("Performing validation")
-        target = open(os.path.join(epoch_checkpoints_path, "val_scores.csv"),'w')
-        target.write("val_name, avg_accuracy, precision, recall, f1 score, mean iou, %s\n" % (class_names_string))
 
         scores_list = []
         class_scores_list = []
@@ -297,31 +305,25 @@ for epoch in range(args.epoch_start_i, args.num_epochs):
 
             # st = time.time()
 
-            output_image = sess.run(predictions_tensor, feed_dict={input_tensor:input_image})
+            output_image = session.run(predictions_tensor, feed_dict={input_tensor:input_image})
 
 
             output_image = np.array(output_image[0,:,:,:])
             output_image = output_image[valid_indices, :]
             output_image = helpers.reverse_one_hot(output_image)
 
-            accuracy, class_accuracies, prec, rec, f1, iou = utils.evaluate_segmentation(pred=output_image,
-                                                                                         label=gt,
-                                                                                         num_classes=num_classes)
+            accuracy, class_accuracies, precision, recall, f1, iou = utils.evaluate_segmentation(pred=output_image,
+                                                                                                 label=gt,
+                                                                                                 num_classes=num_classes)
 
             file_name = utils.filepath_to_name(val_input_names[ind])
-            target.write("%s, %f, %f, %f, %f, %f"%(file_name, accuracy, prec, rec, f1, iou))
-            for item in class_accuracies:
-                target.write(", %f"%(item))
-            target.write("\n")
 
             scores_list.append(accuracy)
             class_scores_list.append(class_accuracies)
-            precision_list.append(prec)
-            recall_list.append(rec)
+            precision_list.append(precision)
+            recall_list.append(recall)
             f1_list.append(f1)
             iou_list.append(iou)
-
-        target.close()
 
         avg_score = np.mean(scores_list)
         class_avg_scores = np.mean(class_scores_list, axis=0)
@@ -332,8 +334,17 @@ for epoch in range(args.epoch_start_i, args.num_epochs):
         avg_iou = np.mean(iou_list)
         avg_iou_per_epoch.append(avg_iou)
 
-        with open(os.path.join(results_path, results_filename), "a+") as results_file:
-            results_file.write("\n" + row_format.format(epoch, avg_score, avg_precision, avg_recall, avg_f1, avg_iou))
+        measures = {
+            'accuracy': avg_score,
+            'class_accuracies': class_avg_scores,
+            'precision': avg_precision,
+            'recall': avg_recall,
+            'f1': avg_f1,
+            'miou': avg_iou
+        }
+
+        summary_formatter.update(current_epoch=epoch,
+                                 measures_dictionary=measures)
 
         print(header_format.format(*headers))
         print(row_format.format(epoch, avg_score, avg_precision, avg_recall, avg_f1, avg_iou))
