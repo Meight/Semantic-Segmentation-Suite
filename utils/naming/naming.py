@@ -12,8 +12,8 @@ class FilesFormatterFactory:
         self.verbose = verbose
 
         self.results_folder = results_folder
-        self._full_detailed_path = self.generate_full_detailed_path()
         self._parameters_string = self.generate_parameters_string()
+        self._full_detailed_path = self.generate_full_detailed_path()
 
         if not sys.path.exists(self._full_detailed_path):
             sys.path.mkdirs(self._full_detailed_path)
