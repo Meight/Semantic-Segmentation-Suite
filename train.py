@@ -219,6 +219,9 @@ for epoch in range(args.epoch_start_i, args.num_epochs):
             input_image_name = train_input_names[id]
             output_image_name = random.choice(images_association[input_image_name])
 
+            print('==================')
+            print(input_image_name, output_image_name)
+
             input_image = utils.load_image(input_image_name)
             output_image = utils.load_image(output_image_name)
 
