@@ -73,9 +73,12 @@ for ind in range(len(test_input_names)):
     input_image = utils.load_image(test_input_names[ind])
     gt = utils.load_image(test_output_names[ind])
 
-    resized_image, resized_labels = resize_to_size(input_image, label=gt, desired_size=input_size)
+    resized_image, gt = resize_to_size(input_image, label=gt, desired_size=input_size)
     input_image = np.expand_dims(np.float32(resized_image), axis=0)/255.0
-    gt = helpers.reverse_one_hot(helpers.one_hot_it(resized_labels, label_values))
+    gt = helpers.reverse_one_hot(helpers.one_hot_it(gt, label_values))
+
+    valid_indices = np.where(np.sum(gt, axis=-1) != 0)
+    gt = gt[valid_indices, :]
 
     st = time.time()
     output_image = sess.run(network,feed_dict={net_input:input_image})
@@ -83,6 +86,7 @@ for ind in range(len(test_input_names)):
     run_times_list.append(time.time()-st)
 
     output_image = np.array(output_image[0,:,:,:])
+    output_image = output_image[valid_indices, :]
     output_image = helpers.reverse_one_hot(output_image)
     out_vis_image = helpers.colour_code_segmentation(output_image, label_values)
 
