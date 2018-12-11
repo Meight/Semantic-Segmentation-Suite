@@ -19,12 +19,12 @@ class FilesFormatterFactory:
             sys.path.mkdirs(self._full_detailed_path)
 
     def generate_full_detailed_path(self):
-        return sys.path.join(self.results_folder,
-                             self.mode,
-                             self.dataset_name,
-                             self.model_name,
-                             self.backbone_name,
-                             self._parameters_string)
+        return os.path.join(self.results_folder,
+                            self.mode,
+                            self.dataset_name,
+                            self.model_name,
+                            self.backbone_name,
+                            self._parameters_string)
 
     def generate_parameters_string(self):
         return '_'.join(['{}-{}'.format(self._get_initials(parameter_name), parameter_value)

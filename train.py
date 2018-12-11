@@ -69,7 +69,8 @@ files_formatter_factory = FilesFormatterFactory(mode='training',
                                                 model_name=model_name,
                                                 backbone_name=backbone_name,
                                                 training_parameters=training_parameters,
-                                                verbose=True)
+                                                verbose=True,
+                                                results_folder='/projets/thesepizenberg/deep-learning/segmentation-suite')
 checkpoint_formatter = files_formatter_factory.get_checkpoint_formatter(saver=tf.train.Saver(max_to_keep=1000))
 summary_formatter = files_formatter_factory.get_summary_formatter()
 
