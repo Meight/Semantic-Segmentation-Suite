@@ -5,7 +5,7 @@ MODEL_NAMES=("BiSeNet")
 FRONTEND_NAMES=("ResNet101")
 INPUT_SIZE=(384)
 BATCH_SIZE=1
-DATASET="voc-ha"
+DATASET="voc-chh"
 
 for model_name in "${MODEL_NAMES[@]}"; do
     for frontend_name in "${FRONTEND_NAMES[@]}"; do
