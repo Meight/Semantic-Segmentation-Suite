@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 SCRIPT_PATH="/projets/thesepizenberg/deep-learning/segmentation-suite/scripts"
-MODEL_NAMES=("BiSeNet")
+MODEL_NAMES=("BiSeNet FC-DenseNet103 GCN DeepLabV3_plus RefineNet DenseASPP PSPNet")
 FRONTEND_NAMES=("ResNet101")
 INPUT_SIZE=(256 384 512)
 BATCH_SIZE=(1)

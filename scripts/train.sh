@@ -48,8 +48,8 @@ wait
 
 
 srun keras-py3-tf /users/thesepizenberg/mlebouch/venv/bin/python "$TRAIN_SCRIPT_DIR/train.py" \
-                --num_epochs=60 \
-                --checkpoint_step=10 \
+                --num_epochs=100 \
+                --checkpoint_step=20 \
                 --validation_step=1 \
                 --num_val_images=1449 \
                 --model=${1} \
@@ -58,8 +58,8 @@ srun keras-py3-tf /users/thesepizenberg/mlebouch/venv/bin/python "$TRAIN_SCRIPT_
                 --crop_width=${3} \
                 --input_size=${3} \
                 --batch_size=${4} \
-                --dataset=${5} \
-                --h_flip=yes \
-                --brightness=0.2 \
-                --rotation=10
+                --dataset=${5}
+                # --h_flip=yes \
+                # --brightness=0.2 \
+                # --rotation=10
 wait
