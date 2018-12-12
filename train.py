@@ -356,37 +356,37 @@ for epoch in range(args.epoch_start_i, args.num_epochs):
         utils.LOG(train_time)
         scores_list = []
 
-        fig1, ax1 = plt.subplots(figsize=(11, 8))
-
-        ax1.plot(range(epoch+1), avg_scores_per_epoch)
-        ax1.set_title("Average validation accuracy vs epochs")
-        ax1.set_xlabel("Epoch")
-        ax1.set_ylabel("Avg. val. accuracy")
-
-
-        plt.savefig(os.path.join(results_path, 'accuracy_vs_epochs.png'))
-
-        plt.clf()
-
-        fig2, ax2 = plt.subplots(figsize=(11, 8))
-
-        ax2.plot(range(epoch+1), avg_loss_per_epoch)
-        ax2.set_title("Average loss vs epochs")
-        ax2.set_xlabel("Epoch")
-        ax2.set_ylabel("Current loss")
-
-        plt.savefig(os.path.join(results_path, 'loss_vs_epochs_{}.png'.format(args.num_val_images)))
-
-        plt.clf()
-
-        fig3, ax3 = plt.subplots(figsize=(11, 8))
-
-        ax3.plot(range(epoch+1), avg_iou_per_epoch)
-        ax3.set_title("Average IoU vs epochs")
-        ax3.set_xlabel("Epoch")
-        ax3.set_ylabel("Current IoU")
-
-        plt.savefig(os.path.join(results_path, 'iou_vs_epochs.png'))
+        # fig1, ax1 = plt.subplots(figsize=(11, 8))
+        #
+        # ax1.plot(range(epoch+1), avg_scores_per_epoch)
+        # ax1.set_title("Average validation accuracy vs epochs")
+        # ax1.set_xlabel("Epoch")
+        # ax1.set_ylabel("Avg. val. accuracy")
+        #
+        #
+        # plt.savefig(os.path.join(results_path, 'accuracy_vs_epochs.png'))
+        #
+        # plt.clf()
+        #
+        # fig2, ax2 = plt.subplots(figsize=(11, 8))
+        #
+        # ax2.plot(range(epoch+1), avg_loss_per_epoch)
+        # ax2.set_title("Average loss vs epochs")
+        # ax2.set_xlabel("Epoch")
+        # ax2.set_ylabel("Current loss")
+        #
+        # plt.savefig(os.path.join(results_path, 'loss_vs_epochs_{}.png'.format(args.num_val_images)))
+        #
+        # plt.clf()
+        #
+        # fig3, ax3 = plt.subplots(figsize=(11, 8))
+        #
+        # ax3.plot(range(epoch+1), avg_iou_per_epoch)
+        # ax3.set_title("Average IoU vs epochs")
+        # ax3.set_xlabel("Epoch")
+        # ax3.set_ylabel("Current IoU")
+        #
+        # plt.savefig(os.path.join(results_path, 'iou_vs_epochs.png'))
 
 
 
