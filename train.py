@@ -30,6 +30,12 @@ def str2bool(v):
         raise argparse.ArgumentTypeError('Boolean value expected.')
 
 parser = argparse.ArgumentParser()
+parser.add_argument('--is-multi-label',
+                    dest='is_multi_label',
+                    action='store_true',
+                    default=False,
+                    help='Whether or not to interpret the task as multi-label classification.')
+
 parser.add_argument('--learning_rate', type=float, default=0.0001, help='Learning rate to use')
 parser.add_argument('--num_epochs', type=int, default=300, help='Number of epochs to train for')
 parser.add_argument('--epoch_start_i', type=int, default=0, help='Start counting epochs from this number')
@@ -51,6 +57,7 @@ parser.add_argument('--model', type=str, default="FC-DenseNet56", help='The mode
 parser.add_argument('--frontend', type=str, default="ResNet101", help='The frontend you are using. See frontend_builder.py for supported models')
 args = parser.parse_args()
 
+_IS_MULTI_LABEL_CLASSIFICATION: bool(args.is_multi_label)
 input_size = int(args.input_size)
 is_dataset_augmented = args.h_flip or args.v_flip or (args.brightness is not None) or (args.rotation is not None)
 

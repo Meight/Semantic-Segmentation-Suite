@@ -15,6 +15,47 @@ from sklearn.metrics import precision_score, \
 
 from utils import helpers
 
+def gather_multi_label_data(dataset_directory):
+    '''
+
+    'train':
+        'image1.png':
+            'background':
+                ['mask1', 'mask2']
+            'person':
+                ['mask1']
+
+    :param dataset_directory:
+    :return:
+    '''
+    paths = {}
+
+    for subset_name in ['train', 'validation', 'test']:
+        paths[subset_name] = {}
+        subset_annotations_path = subset_name + '_labels'
+        cwd = os.getcwd()
+
+        class_directories = os.listdir(os.path.join(cwd, dataset_directory, subset_annotations_path))
+
+        for image_name in os.listdir(os.path.join(cwd, dataset_directory, subset_name)):
+            image_path = os.path.join(cwd, dataset_directory, subset_name, image_name)
+            image_masks = {}
+
+            for current_class_directory in class_directories:
+                current_class_masks = glob.glob(os.path.join(cwd,
+                                                             dataset_directory,
+                                                             subset_annotations_path,
+                                                             current_class_directory,
+                                                             os.path.splitext(image_name)[0] + '*'))
+
+                if current_class_masks:
+                    image_masks[current_class_directory] = current_class_masks
+
+            paths[subset_name][image_path] = image_masks
+
+    return paths
+
+
 def prepare_data(dataset_dir):
     train_input_names=[]
     train_output_names=[]
