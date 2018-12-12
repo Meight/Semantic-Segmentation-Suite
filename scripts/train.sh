@@ -61,5 +61,5 @@ srun keras-py3-tf /users/thesepizenberg/mlebouch/venv/bin/python "$TRAIN_SCRIPT_
                 --dataset=${5} \
                 --h_flip=yes \
                 --brightness=0.2 \
-                --rotation=10 \
+                --rotation=10
 wait
