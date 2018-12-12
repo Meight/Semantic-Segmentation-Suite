@@ -19,7 +19,7 @@ ANALYSIS_SCRIPT="/projets/thesepizenberg/deep-learning/segmentation-suite"
 for dataset_name in "${DATASET_NAMES[@]}"; do
     echo "Launching analysis for dataset ${1}."
     srun -n1 -N1 /projets/thesepizenberg/deep-learning/deeplab-generic/matlab/venv/bin/python3.4 \
-            "ANALYSIS_SCRIPT/analysis.py" --ground-truth-masks-directory=${GROUND_TRUTH_MASKS_DIR} \
+            "${ANALYSIS_SCRIPT}/analysis.py" --ground-truth-masks-directory=${GROUND_TRUTH_MASKS_DIR} \
             --dataset-name=${1}
 done;
 
