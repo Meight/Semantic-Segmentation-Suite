@@ -12,13 +12,11 @@
 set -e
 
 # Various script and dataset paths.
-DATASET_NAMES=("chh")
+DATASET_NAMES=("voc-chh")
 GROUND_TRUTH_MASKS_DIR="/projets/thesepizenberg/deep-learning/deeplab-generic/matlab/Masques"
 ANALYSIS_SCRIPT="/projets/thesepizenberg/deep-learning/segmentation-suite"
 
-srun /projets/thesepizenberg/deep-learning/deeplab-generic/matlab/venv/bin/pip3 install sklearn2
-
-wait
+cd ${ANALYSIS_SCRIPT}
 
 for dataset_name in "${DATASET_NAMES[@]}"; do
     echo "Launching analysis for dataset ${1}."
