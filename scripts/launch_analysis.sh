@@ -12,17 +12,17 @@
 set -e
 
 # Various script and dataset paths.
-DATASET_NAMES=("voc-chh")
+DATASET_NAMES=("voc-chh" "voc-ha")
 GROUND_TRUTH_MASKS_DIR="/projets/thesepizenberg/deep-learning/deeplab-generic/matlab/Masques"
 ANALYSIS_SCRIPT="/projets/thesepizenberg/deep-learning/segmentation-suite"
 
 cd ${ANALYSIS_SCRIPT}
 
 for dataset_name in "${DATASET_NAMES[@]}"; do
-    echo "Launching analysis for dataset ${1}."
+    echo "Launching analysis for dataset ${dataset_name}."
     srun -n1 -N1 /projets/thesepizenberg/deep-learning/deeplab-generic/matlab/venv/bin/python3.4 \
             "${ANALYSIS_SCRIPT}/analysis.py" --ground-truth-masks-directory=${GROUND_TRUTH_MASKS_DIR} \
-            --dataset-name=${1}
+            --dataset-name=${dataset_name} &
 done;
 
 wait
