@@ -4,7 +4,7 @@
 #SBATCH --output=/projets/thesepizenberg/deep-learning/logs/analysis.out
 #SBATCH --error=/projets/thesepizenberg/deep-learning/logs/analysis.out
 
-#SBATCH --ntasks=1
+#SBATCH --ntasks=2
 #SBATCH --cpus-per-task=8
 #SBATCH --partition=24CPUNodes
 #SBATCH --mem-per-cpu=7500M
