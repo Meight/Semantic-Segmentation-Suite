@@ -16,7 +16,7 @@ DATASET_NAMES=("chh")
 GROUND_TRUTH_MASKS_DIR="/projets/thesepizenberg/deep-learning/deeplab-generic/matlab/Masques"
 ANALYSIS_SCRIPT="/projets/thesepizenberg/deep-learning/segmentation-suite"
 
-srun /projets/thesepizenberg/deep-learning/deeplab-generic/matlab/venv/bin/pip3 install opencv-python
+srun /projets/thesepizenberg/deep-learning/deeplab-generic/matlab/venv/bin/pip3 install sklearn2
 
 wait
 
