@@ -65,9 +65,13 @@ def print_table(dictionary):
 
 
 def print_histogram(frequency_array):
+    normalized_frequency_array = np.array(frequency_array) / np.sum(frequency_array)
     with open(os.path.join(histograms_save_path, 'similarity.dat'), 'a') as the_file:
-        the_file.write(", ".join(str(x) for x in frequency_array))
+        for i in range(len(frequency_array)):
+            the_file.write("{} {} {}".format(i, frequency_array[i], normalized_frequency_array[i]))
+
         print(", ".join(str(x) for x in frequency_array))
+        print(", ".join(str(x) for x in normalized_frequency_array))
 
 
 def class_similarity(class_index, ground_truth, mask):
