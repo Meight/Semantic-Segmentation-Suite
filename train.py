@@ -78,8 +78,7 @@ _TRAINING_PARAMETERS = {
     'batch_size': int(args.batch_size),
     'validation_steps': int(args.num_val_images),
     'input_size': _INPUT_SIZE,
-    'augmented': is_dataset_augmented,
-    'multi_class': _IS_MULTI_LABEL_CLASSIFICATION
+    'augmented': is_dataset_augmented
 }
 files_formatter_factory = FilesFormatterFactory(mode='training',
                                                 dataset_name=_DATASET_NAME,
