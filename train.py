@@ -12,7 +12,8 @@ import numpy as np
 import tensorflow as tf
 
 from utils.naming.naming import FilesFormatterFactory
-from utils.utils import build_images_association_dictionary
+from utils.utils import build_images_association_dictionary, gather_multi_label_data, \
+    get_all_available_annotation_resized_tensors_for_image
 
 matplotlib.use('Agg')
 
@@ -58,26 +59,33 @@ parser.add_argument('--frontend', type=str, default="ResNet101", help='The front
 args = parser.parse_args()
 
 _IS_MULTI_LABEL_CLASSIFICATION: bool(args.is_multi_label)
-input_size = int(args.input_size)
-is_dataset_augmented = args.h_flip or args.v_flip or (args.brightness is not None) or (args.rotation is not None)
+_INPUT_SIZE = int(args.input_size)
 
-dataset_name = str(args.dataset)
-model_name = str(args.model)
-backbone_name = str(args.frontend)
+# No augmentation available for multi-label classification.
+is_dataset_augmented = not _IS_MULTI_LABEL_CLASSIFICATION and (args.h_flip
+                                                               or args.v_flip
+                                                               or (args.brightness is not None)
+                                                               or (args.rotation is not None))
 
-training_parameters = {
+_DATASET_NAME = str(args.dataset)
+_MODEL_NAME = str(args.model)
+_BACKBONE_NAME = str(args.frontend)
+
+_TRAINING_PARAMETERS = {
+    'model': _MODEL_NAME,
     'epochs': int(args.num_epochs),
     'learning_rate': float(args.learning_rate),
     'batch_size': int(args.batch_size),
     'validation_steps': int(args.num_val_images),
-    'input_size': input_size,
-    'augmented': is_dataset_augmented
+    'input_size': _INPUT_SIZE,
+    'augmented': is_dataset_augmented,
+    'multi_class': _IS_MULTI_LABEL_CLASSIFICATION
 }
 files_formatter_factory = FilesFormatterFactory(mode='training',
-                                                dataset_name=dataset_name,
-                                                model_name=model_name,
-                                                backbone_name=backbone_name,
-                                                training_parameters=training_parameters,
+                                                dataset_name=_DATASET_NAME,
+                                                model_name=_MODEL_NAME,
+                                                backbone_name=_BACKBONE_NAME,
+                                                training_parameters=_TRAINING_PARAMETERS,
                                                 verbose=True,
                                                 results_folder='/projets/thesepizenberg/deep-learning/segmentation-suite')
 
@@ -108,6 +116,8 @@ def data_augmentation(input_image, output_image):
 
 # Get the names of the classes so we can record the evaluation results
 class_names_list, label_values = helpers.get_label_info(os.path.join(args.dataset, "class_dict.csv"))
+class_colors_dictionary = dict(zip(class_names_list, label_values))
+
 class_names_string = ""
 for class_name in class_names_list:
     if not class_name == class_names_list[-1]:
@@ -139,10 +149,17 @@ unc = tf.where(tf.equal(tf.reduce_sum(output_tensor, axis=-1), 0),
                tf.zeros(shape=weights_shape),
                tf.ones(shape=weights_shape))
 
+if not _IS_MULTI_LABEL_CLASSIFICATION:
+    print('Using softmax cross entropy.')
+    adapted_loss = tf.nn.softmax_cross_entropy_with_logits_v2(logits=predictions_tensor,
+                                                              labels=output_tensor)
+else:
+    print('Using sigmoid cross entropy.')
+    adapted_loss = tf.nn.sigmoid_cross_entropy_with_logits(logits=predictions_tensor,
+                                                           labels=output_tensor)
+
 loss = tf.reduce_mean(tf.losses.compute_weighted_loss(weights=tf.cast(unc, tf.float32),
-                                                      losses=tf.nn.softmax_cross_entropy_with_logits_v2(
-                                                          logits=predictions_tensor,
-                                                          labels=output_tensor)))
+                                                      losses=adapted_loss))
 
 opt = tf.train.RMSPropOptimizer(learning_rate=args.learning_rate,
                                 decay=0.995,
@@ -169,7 +186,23 @@ if args.continue_training:
 
 # Load the data
 print("Loading the data ...")
-train_input_names,train_output_names, val_input_names, val_output_names, test_input_names, test_output_names = utils.prepare_data(dataset_dir=args.dataset)
+
+train_output_names, val_output_names, test_output_names = None, None, None
+paths = None
+
+if not _IS_MULTI_LABEL_CLASSIFICATION:
+    train_input_names, \
+    train_output_names, \
+    val_input_names, \
+    val_output_names, \
+    test_input_names, \
+    test_output_names = utils.prepare_data(dataset_dir=args.dataset)
+else:
+    paths = gather_multi_label_data(dataset_directory=_DATASET_NAME)
+
+    train_input_names = paths['train'].keys()
+    val_input_names = paths['val'].keys()
+    test_input_names = paths['test'].keys()
 
 
 
@@ -208,7 +241,8 @@ results_filename = "results-{}-{}-{}.txt".format(args.input_size,
                                                  args.num_val_images,
                                                  'augmented' if is_dataset_augmented else 'non-augmented')
 
-images_association = build_images_association_dictionary(train_input_names, train_output_names)
+if not _IS_MULTI_LABEL_CLASSIFICATION:
+    images_association = build_images_association_dictionary(train_input_names, train_output_names)
 
 # Do the training here
 for epoch in range(args.epoch_start_i, args.num_epochs):
@@ -236,13 +270,23 @@ for epoch in range(args.epoch_start_i, args.num_epochs):
             id = id_list[index]
 
             input_image_name = train_input_names[id]
-            output_image_name = random.choice(images_association[input_image_name])
-
             input_image = utils.load_image(input_image_name)
-            output_image = utils.load_image(output_image_name)
+
+            if not _IS_MULTI_LABEL_CLASSIFICATION:
+                output_image_name = random.choice(images_association[input_image_name])
+                output_image = utils.load_image(output_image_name)
+            else:
+                n_encoded_masks = get_all_available_annotation_resized_tensors_for_image((_INPUT_SIZE, _INPUT_SIZE),
+                                                                                         paths['train'][id],
+                                                                                         class_colors_dictionary)
+                output_image = random.choice(n_encoded_masks)
 
             with tf.device('/cpu:0'):
-                input_image, output_image = data_augmentation(input_image, output_image)
+                if not _IS_MULTI_LABEL_CLASSIFICATION:
+                    input_image, output_image = data_augmentation(input_image, output_image)
+                else:
+                    # Output tensor is already resized at this point.
+                    input_image, _ = utils.resize_to_size(_INPUT_SIZE, desired_size=_INPUT_SIZE)
 
                 # Prep the data. Make sure the labels are in one-hot format
                 input_image = np.float32(input_image) / 255.0

@@ -1,22 +1,29 @@
 from __future__ import print_function, division
-import os,time,cv2, sys, math
-import tensorflow as tf
-import tensorflow.contrib.slim as slim
-import numpy as np
-import time, datetime
-from PIL import Image
-import os, random
+
+import datetime
 import glob
+import os
+import random
+
+import cv2
+import numpy as np
+import sys
+import tensorflow as tf
+from PIL import Image
 from scipy.misc import imread
-import ast
 from sklearn.metrics import precision_score, \
-    recall_score, confusion_matrix, classification_report, \
-    accuracy_score, f1_score
+    recall_score, f1_score
 
 from utils import helpers
 
+
 def gather_multi_label_data(dataset_directory):
     '''
+    Retrieves all images per subset for the training, validation and testing phases.
+
+    For each image, retrieves the associated masks for each class present within the dataset. There may be several
+    of such annotations for any given class. The function expects these annotations to have their name beginning
+    with the their associated image's name.
 
     'train':
         'image1.png':
@@ -25,7 +32,7 @@ def gather_multi_label_data(dataset_directory):
             'person':
                 ['mask1']
 
-    :param dataset_directory:
+    :param dataset_directory: the name of the directory where to look for the subsets.
     :return:
     '''
     paths = {}
@@ -54,6 +61,49 @@ def gather_multi_label_data(dataset_directory):
             paths[subset_name][image_path] = image_masks
 
     return paths
+
+
+def get_all_available_annotation_resized_tensors_for_image(input_shape,
+                                                           image_masks_dictionary,
+                                                           class_colors_dictionary,
+                                                           mode='linear'):
+    available_modes = ['linear']
+    n_hot_encoded_tensors = []
+
+    if not image_masks_dictionary.values():
+        return n_hot_encoded_tensors
+
+    if not mode in available_modes:
+        raise Exception('Provided mode {} is not supported for tensors generation in multi-label classification.'.
+                        format(mode))
+
+    if mode == 'linear':
+        # In linear mode, all classes are expected to have the same amount of masks so that one tensor can
+        # be created "vertically."
+        masks_count = len(next(iter(image_masks_dictionary.values())))
+        blank_mask = np.ones(input_shape)
+
+        for k in range(masks_count):
+            different_classes_one_hot = []
+            for class_name, class_colors in class_colors_dictionary.items():
+                class_mask = blank_mask
+
+                if class_name in image_masks_dictionary.keys():
+                    mask_image, _ = resize_to_size(load_image(image_masks_dictionary[class_name][k]),  desired_size=input_shape[0])
+                    equality = np.equal(mask_image, class_colors)
+                    class_mask = np.all(equality, axis=-1)
+
+                print('Mask shape', np.shape(class_mask))
+                different_classes_one_hot.append(class_mask)
+
+            if different_classes_one_hot:
+                n_hot_encoded_tensors.append(np.stack(different_classes_one_hot, axis=-1))
+
+    return n_hot_encoded_tensors
+
+
+def to_n_hot_encoded(masks_dictionary, class_names):
+    return np.asarray([1 if class_name in masks_dictionary.keys() else 0 for class_name in class_names])
 
 
 def prepare_data(dataset_dir):
@@ -235,6 +285,26 @@ def resize_to_size(image, label = None, desired_size = 256):
                                    value=color)
 
     return image, label
+
+
+def resize_pil_image(image_pil, width, height):
+    '''
+    Resize PIL image keeping ratio and using white background.
+    '''
+    if image_pil.width / width > image_pil.height / height:
+        # It must be fixed by width
+        resize_width = width
+        resize_height = round(height * (width / image_pil.width))
+    else:
+        # Fixed by height
+        resize_width = round(width * (height / image_pil.height))
+        resize_height = height
+    image_resize = image_pil.resize((resize_width, resize_height), Image.ANTIALIAS)
+    background = Image.new('RGBA', (width, height), (255, 255, 255, 255))
+    offset = (round((width - resize_width) / 2), round((height - resize_height) / 2))
+    background.paste(image_resize, offset)
+    return background.convert('RGB')
+
 
 # Randomly crop the image to a specific size. For data augmentation
 def random_crop(image, label, crop_height, crop_width):
